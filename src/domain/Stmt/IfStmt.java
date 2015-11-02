@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.IDictionary;
+import domain.DataStructures.Interface.IDictionary;
 import domain.Expression.Exp;
 
 /**

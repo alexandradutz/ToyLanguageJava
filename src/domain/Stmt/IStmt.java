@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.IDictionary;
+import domain.DataStructures.Interface.IDictionary;
 
 /**
  * Created by Dutzi on 10/11/2015.

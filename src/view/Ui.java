@@ -44,7 +44,10 @@ public class Ui {
             "1. Compound statement\n" +
             "2. Assign Statement\n" +
             "3. IF Statement\n" +
-            "4. Print Statement\n";
+            "4. Print Statement\n" +
+            "5. Increment Statement\n" +
+            "6. For Statement\n" +
+            "7. While Statement\n";
     private String expressionMenu = "\nEXPRESSION MENU\n" +
             "1. Arithmetical expression\n" +
             "2. Constant expression\n" +
@@ -75,9 +78,9 @@ public class Ui {
         if (option != 0 && crtPrg == null) {
             switch (option) {
                 case 1: {
-                    //inputProgram();
+                    inputProgram();
                     //ctrl.getRepo().example1();
-                    ctrl.getRepo().example2();
+                    //ctrl.getRepo().example2();
                     initialMenu();
                     break;
                 }
@@ -159,6 +162,32 @@ public class Ui {
         return new PrintStmt(expression);
     }
 
+    private IncStmt incStmt(){
+        System.out.println("Expression");
+        Exp expression = inputExpression();
+        return new IncStmt(expression);
+    }
+
+    private ForStmt forStmt(){
+        System.out.println("Expression: (first index)");
+        Exp exp1 = inputExpression();
+        System.out.println("Expression: (last index)");
+        Exp exp2 = inputExpression();
+        System.out.println("Expression: (step size)");
+        Exp exp3 = inputExpression();
+        System.out.println("Statement:");
+        IStmt stmt = inputStatement();
+        return new ForStmt(exp1, exp2, exp3, stmt);
+    }
+
+    private WhileStmt whileStmt(){
+        System.out.println("While Expression: ");
+        Exp exp = inputExpression();
+        System.out.println("Statement");
+        IStmt stmt = inputStatement();
+        return new WhileStmt(exp, stmt);
+    }
+
     /**
      * @return
      */
@@ -184,6 +213,18 @@ public class Ui {
             }
             case 4: {
                 current = printStmt();
+                break;
+            }
+            case 5: {
+                current = incStmt();
+                break;
+            }
+            case 6: {
+                current = forStmt();
+                break;
+            }
+            case 7: {
+                current = whileStmt();
                 break;
             }
             default:
