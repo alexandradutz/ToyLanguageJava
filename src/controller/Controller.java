@@ -1,8 +1,9 @@
 package controller;
 
-import domain.DataStructures.IDictionary;
-import domain.DataStructures.IList;
-import domain.DataStructures.IStack;
+import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Interface.IList;
+import domain.DataStructures.Interface.IStack;
+import domain.Expression.ConstExp;
 import domain.Expression.Exp;
 import domain.PrgState;
 import domain.Stmt.*;
@@ -73,6 +74,47 @@ public class Controller
             {
                 stk.push(elseS);
             }
+        }
+        if(crtStmt instanceof IncStmt)
+        {
+            IncStmt incStmt = (IncStmt) crtStmt;
+            Exp exp = incStmt.getVar();
+            IDictionary symTable = state.getSymTable();
+            if(symTable.isKey(exp.toStr()))
+            {
+                symTable.modify(exp.toStr(), exp.eval(symTable) + 1);
+            }
+        }
+        if(crtStmt instanceof ForStmt)
+        {
+            IDictionary symTable = state.getSymTable();
+            ForStmt forSt = (ForStmt) crtStmt;
+            if(forSt.getExp1().eval(symTable) < forSt.getExp2().eval(symTable)) {
+                int e1 = forSt.getExp1().eval(symTable);
+                int e2 = forSt.getExp2().eval(symTable);
+                int e3 = forSt.getExp3().eval(symTable);
+                IStmt stmt = forSt.getStmt();
+
+                Exp f1 = new ConstExp(e1 + e3);
+                Exp f2 = new ConstExp(e2);
+                Exp f3 = new ConstExp(e3);
+                ForStmt forSt2 = new ForStmt(f1, f2, f3, stmt);
+                stk.push(forSt2);
+                stk.push(stmt);
+            }
+        }
+        if(crtStmt instanceof WhileStmt)
+        {
+            IDictionary symTable = state.getSymTable();
+            WhileStmt whileSt = (WhileStmt) crtStmt;
+            if(whileSt.getExpr().eval(symTable) != 0) {
+                int e1 = whileSt.getExpr().eval(symTable);
+                IStmt stmt = whileSt.getStmt();
+
+                stk.push(whileSt);
+                stk.push(stmt);
+            }
+
         }
         else if (crtStmt instanceof PrintStmt)
         {

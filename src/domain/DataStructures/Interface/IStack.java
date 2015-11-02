@@ -1,4 +1,4 @@
-package domain.DataStructures;
+package domain.DataStructures.Interface;
 
 import domain.Stmt.IStmt;
 

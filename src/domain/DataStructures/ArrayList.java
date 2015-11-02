@@ -1,5 +1,7 @@
 package domain.DataStructures;
 
+import domain.DataStructures.Interface.IList;
+
 /**
  * Created by Dutzi on 10/11/2015.
  */

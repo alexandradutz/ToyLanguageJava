@@ -1,7 +1,7 @@
 package domain.DataStructures;
 
+import domain.DataStructures.Interface.IStack;
 import domain.Stmt.IStmt;
-import domain.Stmt.IfStmt;
 
 /**
  * Created by Dutzi on 10/6/2015.

@@ -1,6 +1,6 @@
 package domain.Expression;
 
-import domain.DataStructures.IDictionary;
+import domain.DataStructures.Interface.IDictionary;
 
 /**
  * Created by Dutzi on 10/13/2015.

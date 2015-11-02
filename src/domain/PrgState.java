@@ -1,8 +1,8 @@
 package domain;
 
-import domain.DataStructures.IDictionary;
-import domain.DataStructures.IList;
-import domain.DataStructures.IStack;
+import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Interface.IList;
+import domain.DataStructures.Interface.IStack;
 import domain.Stmt.IStmt;
 
 /**

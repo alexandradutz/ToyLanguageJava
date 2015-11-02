@@ -1,4 +1,4 @@
-package domain.DataStructures;
+package domain.DataStructures.Interface;
 
 import exception.MyException;
 
@@ -12,4 +12,5 @@ public interface IDictionary {
     public int size();
     public boolean isKey(String key);
     public String toStr();
+    public void modify(String key, int value);
 }

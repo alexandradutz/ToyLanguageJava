@@ -1,6 +1,6 @@
 package domain.Expression;
 
-import domain.DataStructures.IDictionary;
+import domain.DataStructures.Interface.IDictionary;
 import exception.MyException;
 
 /**

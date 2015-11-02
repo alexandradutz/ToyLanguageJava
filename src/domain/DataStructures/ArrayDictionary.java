@@ -1,15 +1,18 @@
 package domain.DataStructures;
 
+import domain.DataStructures.Interface.IDictionary;
 import exception.MyException;
 
 /**
  * Created by Dutzi on 10/6/2015.
  */
 
-public class ArrayDictionary implements IDictionary{
+public class ArrayDictionary implements IDictionary {
     private int[] elems;
     private String[] keys;
     private int nrElem;
+
+
 
     public ArrayDictionary(){
         nrElem = 0;
@@ -24,6 +27,12 @@ public class ArrayDictionary implements IDictionary{
     public void add(String key, int value){
         if( nrElem == elems.length){
             resize();
+        }
+        for(int i = 0; i < nrElem; i++){
+            if(keys[i].equals(key)){
+                elems[i] = value;
+                return;
+            }
         }
         elems[nrElem] = value;
         keys[nrElem++] = key;
@@ -58,7 +67,7 @@ public class ArrayDictionary implements IDictionary{
     public boolean isKey(String key){
         int i;
         for(i = 0; i < nrElem; i++){
-            if(keys[i] == key){ break; }
+            if(keys[i].equals(key)){return true; }
         }
         return i < nrElem;
     }
@@ -71,6 +80,20 @@ public class ArrayDictionary implements IDictionary{
             res = res + ", " + keys[i] + ":" + elems[i];
         }
         return res;
+    }
+
+    @Override
+    public void modify(String key, int value) {
+        int i;
+        for(i = 0; i < nrElem; i++)
+        {
+            if(keys[i].equals(key))
+            {
+                elems[i] = value;
+                break;
+            }
+        }
+
     }
 
 }

@@ -1,15 +1,14 @@
 package repository;
 
 import domain.DataStructures.*;
+import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Interface.IList;
+import domain.DataStructures.Interface.IStack;
 import domain.Expression.ArithExp;
 import domain.Expression.ConstExp;
 import domain.Expression.VarExp;
 import domain.PrgState;
-import domain.Stmt.AssignStmt;
-import domain.Stmt.CompStmt;
-import domain.Stmt.IStmt;
-import domain.Stmt.PrintStmt;
-import exception.MyException;
+import domain.Stmt.*;
 
 /**
  * Created by Dutzi on 10/14/2015.
@@ -64,10 +63,15 @@ public class Repository implements IRepository {
         IStack exeStack = new ArrayStack();
         IDictionary symTable = new ArrayDictionary();
         IList out = new ArrayList();
-        IStmt ex2 = new CompStmt(new AssignStmt("a", new ArithExp(new ConstExp(2),new ArithExp(new ConstExp(3), new ConstExp(5), "*"), "+")), new CompStmt(
-                new AssignStmt("b",new ArithExp(new VarExp("a"), new ConstExp(1), "+")), new PrintStmt(new VarExp("b"))));
+        IStmt prgStmt =  new CompStmt(new AssignStmt("v",new ConstExp(2)),
+                new CompStmt(new AssignStmt("k",new ConstExp(0)),
+                        new CompStmt(new AssignStmt("a",new VarExp("k")),
+                                new CompStmt(new IfStmt(new VarExp("a"),
+                                        new IfStmt(new VarExp("v"),new PrintStmt(new VarExp("v")),new PrintStmt(new VarExp("a"))),
+                                        new CompStmt(new AssignStmt("v",new ConstExp(5)),new PrintStmt(new VarExp("v")))),
+                                        new PrintStmt(new VarExp("v"))))));
 
-        exeStack.push(ex2);
+        exeStack.push(prgStmt);
         PrgState inputState = new PrgState(exeStack, symTable, out);
         this.state[0] = inputState;
         if(exeStack.isEmpty()){

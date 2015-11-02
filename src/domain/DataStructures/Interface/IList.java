@@ -1,4 +1,4 @@
-package domain.DataStructures;
+package domain.DataStructures.Interface;
 
 /**
  * Created by Dutzi on 10/11/2015.
