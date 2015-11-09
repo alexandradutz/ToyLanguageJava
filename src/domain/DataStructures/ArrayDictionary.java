@@ -3,12 +3,15 @@ package domain.DataStructures;
 import domain.DataStructures.Interface.IDictionary;
 import exception.MyException;
 
+import java.util.*;
+import java.util.ArrayList;
+
 /**
  * Created by Dutzi on 10/6/2015.
  */
 
-public class ArrayDictionary implements IDictionary {
-    private int[] elems;
+public class ArrayDictionary implements IDictionary<String, Integer>{
+    private Integer[] elems;
     private String[] keys;
     private int nrElem;
 
@@ -17,14 +20,14 @@ public class ArrayDictionary implements IDictionary {
     public ArrayDictionary(){
         nrElem = 0;
         keys = new String[20];
-        elems = new int[20];
+        elems = new Integer[20];
     }
 
     public boolean isEmpty(){
         return nrElem == 0;
     }
 
-    public void add(String key, int value){
+    public void add(String key, Integer value){
         if( nrElem == elems.length){
             resize();
         }
@@ -39,7 +42,7 @@ public class ArrayDictionary implements IDictionary {
     }
 
     public void resize(){
-        int tmp[] = new int[elems.length * 2];
+        Integer tmp[] = new Integer[elems.length * 2];
         String k[] = new String[elems.length * 2];
 
         for(int i = 0; i < nrElem; i++){
@@ -50,7 +53,7 @@ public class ArrayDictionary implements IDictionary {
         keys = k;
     }
 
-    public int getValue(String key) throws MyException {
+    public Integer getValue(String key) throws MyException {
         int i;
         for(i = 0; i < nrElem; i++){
             if(keys[i].equals(key)){
@@ -73,7 +76,7 @@ public class ArrayDictionary implements IDictionary {
     }
 
     @Override
-    public String toStr() {
+    public String toString() {
         String res = "";
         for(int i = 0; i < nrElem; i++)
         {
@@ -83,7 +86,7 @@ public class ArrayDictionary implements IDictionary {
     }
 
     @Override
-    public void modify(String key, int value) {
+    public void modify(String key, Integer value) {
         int i;
         for(i = 0; i < nrElem; i++)
         {
@@ -96,5 +99,9 @@ public class ArrayDictionary implements IDictionary {
 
     }
 
+    @Override
+    public ArrayList<String> keys() {
+        return null;
+    }
 }
 

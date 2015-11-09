@@ -28,7 +28,7 @@ public class AssignStmt implements IStmt {
      * @return
      */
     @Override
-    public String toStr()
+    public String toString()
     {
         return id + "=" + exp.toStr();
     }

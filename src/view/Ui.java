@@ -1,13 +1,12 @@
 package view;
 
 import controller.Controller;
-import domain.DataStructures.ArrayDictionary;
-import domain.DataStructures.ArrayList;
-import domain.DataStructures.ArrayStack;
-import domain.Expression.ArithExp;
-import domain.Expression.ConstExp;
-import domain.Expression.Exp;
-import domain.Expression.VarExp;
+import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.LibDataStructs.LibDictionary;
+import domain.DataStructures.LibDataStructs.LibList;
+import domain.DataStructures.LibDataStructs.LibStack;
+import domain.Expression.*;
+import domain.Stmt.IStmt;
 import domain.PrgState;
 import domain.Stmt.*;
 import repository.IRepository;
@@ -46,12 +45,15 @@ public class Ui {
             "3. IF Statement\n" +
             "4. Print Statement\n" +
             "5. Increment Statement\n" +
-            "6. For Statement\n" +
-            "7. While Statement\n";
+            "6. While Statement\n" +
+            "7. Switch Statement\n";
     private String expressionMenu = "\nEXPRESSION MENU\n" +
             "1. Arithmetical expression\n" +
             "2. Constant expression\n" +
-            "3. Variable expression\n";
+            "3. Variable expression\n" +
+            "4. Relational expression\n" +
+            "5. Logical expression\n" +
+            "6. Read expression\n";
 
 
     private void allStep() {
@@ -168,17 +170,6 @@ public class Ui {
         return new IncStmt(expression);
     }
 
-    private ForStmt forStmt(){
-        System.out.println("Expression: (first index)");
-        Exp exp1 = inputExpression();
-        System.out.println("Expression: (last index)");
-        Exp exp2 = inputExpression();
-        System.out.println("Expression: (step size)");
-        Exp exp3 = inputExpression();
-        System.out.println("Statement:");
-        IStmt stmt = inputStatement();
-        return new ForStmt(exp1, exp2, exp3, stmt);
-    }
 
     private WhileStmt whileStmt(){
         System.out.println("While Expression: ");
@@ -188,6 +179,27 @@ public class Ui {
         return new WhileStmt(exp, stmt);
     }
 
+    private SwitchStmt switchStmt(){
+        System.out.println("Varname: ");
+        String varname = reader.next();
+        Exp exp;
+        String opt;
+        IStmt stmt;
+        IDictionary<Exp, IStmt> tbl = new LibDictionary<>();
+        while(true){
+            System.out.println("Expression (CASE): ");
+            exp = inputExpression();
+            System.out.println("Statement: ");
+            stmt = inputStatement();
+            tbl.add(exp, stmt);
+            System.out.println("Another CASE? (y/n)");
+            opt = reader.next();
+            if(opt.equals("n")){break;}
+        }
+        System.out.println("DEFAULT statement: ");
+        stmt = inputStatement();
+        return  new SwitchStmt(varname, tbl, stmt);
+    }
     /**
      * @return
      */
@@ -220,11 +232,11 @@ public class Ui {
                 break;
             }
             case 6: {
-                current = forStmt();
+                current = whileStmt();
                 break;
             }
             case 7: {
-                current = whileStmt();
+                current = switchStmt();
                 break;
             }
             default:
@@ -257,6 +269,37 @@ public class Ui {
         return new VarExp(id);
     }
 
+    private BoolExp boolExp() {
+        System.out.println("Operators: <, <=, >, >=, ==, !=\n");
+        System.out.println("Operator:");
+        String operator = reader.next();
+        System.out.println("Left operand: ");
+        Exp left = inputExpression();
+        System.out.println("Right operand: ");
+        Exp right = inputExpression();
+        return new BoolExp(left, right, operator);
+    }
+
+    private  LogicalExp logicalExp(){
+        System.out.println("Operators: &&, ||, !\n");
+        System.out.println("Operator:");
+        String operator = reader.next();
+        System.out.println("Left operand: ");
+        Exp left = inputExpression();
+        if(!operator.equals("!")){
+            System.out.println("Right operand: ");
+            Exp right = inputExpression();
+            return new LogicalExp(left, right, operator);
+        }
+        return new LogicalExp(left, operator);
+    }
+
+    private  ReadExp readExp(){
+        System.out.println("Introduce an integer for ToyLanguage ");
+        Integer no = reader.nextInt();
+        return new ReadExp(no);
+    }
+
     private Exp inputExpression() {
         int option;
         System.out.println(expressionMenu);
@@ -277,6 +320,18 @@ public class Ui {
                 expression = varExp();
                 break;
             }
+            case 4: {
+                expression = boolExp();
+                break;
+            }
+            case 5:{
+                expression = logicalExp();
+                break;
+            }
+            case 6: {
+                expression = readExp();
+                break;
+            }
             default: {
                 System.out.println("Invalid option!");
                 expression = inputExpression();
@@ -287,15 +342,14 @@ public class Ui {
 
     private void inputProgram() {
         IStmt programStmt = inputStatement();
-        ArrayStack stk = new ArrayStack();
-        ArrayDictionary dict = new ArrayDictionary();
-        ArrayList lst = new ArrayList();
+        //LibStack<> stk = new LibStack<IStmt>();
+        //LibDictionary<> dict = new LibDictionary<String, Integer>();
+        //LibList lst = new LibList<String>();
 
-        stk.push(programStmt);
-        PrgState crtPrg = new PrgState(stk, dict, lst);
+        //stk.push(programStmt);
+        PrgState crtPrg = new PrgState(new LibStack<>(), new LibDictionary<>(), new LibList<>(), programStmt);
 
         ctrl.getRepo().setCrtPrg(crtPrg);
-
         if (ctrl.getRepo().getCrtPrg().getExeStack().isEmpty()) {
             System.out.println("No input program. Exe Stack IS empty, in UI!");
         } else {

@@ -1,15 +1,13 @@
 package domain.DataStructures.Interface;
 
-import domain.Stmt.IStmt;
-
 /**
  * Created by Dutzi on 10/6/2015.
  */
 
-public interface IStack {
-    public void push(IStmt o);
-    public IStmt pop();
+public interface IStack<T>{
+    public void push(T o);
+    public T pop();
     public boolean isEmpty();
-    public IStmt top();
-    public String toStr();
+    public T top();
+    public String toString();
 }

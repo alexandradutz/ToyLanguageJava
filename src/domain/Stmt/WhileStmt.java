@@ -16,8 +16,8 @@ public class WhileStmt implements IStmt {
     }
 
     @Override
-    public String toStr() {
-        return "WHILE(" + expr.toStr() + ") {" + stmt.toStr() + "}";
+    public String toString() {
+        return "WHILE(" + expr.toStr() + ") {" + stmt.toString() + "}";
     }
 
     @Override

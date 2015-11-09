@@ -16,7 +16,7 @@ public class IncStmt implements IStmt {
     }
 
     @Override
-    public String toStr() {
+    public String toString() {
         return "inc(" + var.toStr() + ")";
     }
 

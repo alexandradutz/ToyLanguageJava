@@ -20,9 +20,9 @@ public class IfStmt implements IStmt {
     }
 
     @Override
-    public String toStr()
+    public String toString()
     {
-        return "IF (" + exp.toStr() + ") THEN (" + thenS.toStr() + ") ELSE (" + elseS.toStr() + ")";
+        return "IF (" + exp.toStr() + ") THEN (" + thenS.toString() + ") ELSE (" + elseS.toString() + ")";
     }
 
     /**

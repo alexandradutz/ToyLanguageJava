@@ -5,7 +5,7 @@ import domain.DataStructures.Interface.IList;
 /**
  * Created by Dutzi on 10/11/2015.
  */
-public class ArrayList implements IList {
+public class ArrayList implements IList<String> {
     private String[] elems;
     private int nrElem;
 
@@ -49,7 +49,7 @@ public class ArrayList implements IList {
     }
 
     @Override
-    public String toStr() {
+    public String toString() {
         String res = "";
         for(int i = 0; i < nrElem; i++)
         {

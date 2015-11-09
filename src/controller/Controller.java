@@ -3,11 +3,14 @@ package controller;
 import domain.DataStructures.Interface.IDictionary;
 import domain.DataStructures.Interface.IList;
 import domain.DataStructures.Interface.IStack;
+import domain.Expression.ArithExp;
 import domain.Expression.ConstExp;
 import domain.Expression.Exp;
 import domain.PrgState;
 import domain.Stmt.*;
 import repository.IRepository;
+
+import java.util.*;
 
 /**
  * Created by Dutzi on 10/20/2015.
@@ -40,7 +43,7 @@ public class Controller
      */
     public void oneStep(PrgState state)
     {
-        IStack stk = state.getExeStack();
+        IStack<IStmt> stk = state.getExeStack();
         if(stk.isEmpty()) System.out.println("stack is empty");
         IStmt crtStmt = stk.pop();
         if(crtStmt instanceof CompStmt)
@@ -55,7 +58,7 @@ public class Controller
             AssignStmt aStmt = (AssignStmt) crtStmt;
             String id = aStmt.getId();
             Exp exp = aStmt.getExp();
-            IDictionary symTable = state.getSymTable();
+            IDictionary<String, Integer> symTable = state.getSymTable();
             symTable.add(id, exp.eval(symTable));
         }
 
@@ -65,7 +68,7 @@ public class Controller
             IStmt thenS = ifSt.getThenS();
             IStmt elseS = ifSt.getElseS();
             Exp ifExp = ifSt.getExp();
-            IDictionary symTable = state.getSymTable();
+            IDictionary<String, Integer> symTable = state.getSymTable();
             if(ifExp.eval(symTable) != 0)
             {
                 stk.push(thenS);
@@ -75,40 +78,19 @@ public class Controller
                 stk.push(elseS);
             }
         }
-        if(crtStmt instanceof IncStmt)
-        {
+        if(crtStmt instanceof IncStmt) {
             IncStmt incStmt = (IncStmt) crtStmt;
             Exp exp = incStmt.getVar();
-            IDictionary symTable = state.getSymTable();
-            if(symTable.isKey(exp.toStr()))
-            {
+            IDictionary<String, Integer> symTable = state.getSymTable();
+            if (symTable.isKey(exp.toStr())) {
                 symTable.modify(exp.toStr(), exp.eval(symTable) + 1);
-            }
-        }
-        if(crtStmt instanceof ForStmt)
-        {
-            IDictionary symTable = state.getSymTable();
-            ForStmt forSt = (ForStmt) crtStmt;
-            if(forSt.getExp1().eval(symTable) < forSt.getExp2().eval(symTable)) {
-                int e1 = forSt.getExp1().eval(symTable);
-                int e2 = forSt.getExp2().eval(symTable);
-                int e3 = forSt.getExp3().eval(symTable);
-                IStmt stmt = forSt.getStmt();
-
-                Exp f1 = new ConstExp(e1 + e3);
-                Exp f2 = new ConstExp(e2);
-                Exp f3 = new ConstExp(e3);
-                ForStmt forSt2 = new ForStmt(f1, f2, f3, stmt);
-                stk.push(forSt2);
-                stk.push(stmt);
             }
         }
         if(crtStmt instanceof WhileStmt)
         {
-            IDictionary symTable = state.getSymTable();
+            IDictionary<String, Integer> symTable = state.getSymTable();
             WhileStmt whileSt = (WhileStmt) crtStmt;
             if(whileSt.getExpr().eval(symTable) != 0) {
-                int e1 = whileSt.getExpr().eval(symTable);
                 IStmt stmt = whileSt.getStmt();
 
                 stk.push(whileSt);
@@ -116,23 +98,41 @@ public class Controller
             }
 
         }
+        if(crtStmt instanceof SwitchStmt){
+            IDictionary<String, Integer> symTable = state.getSymTable();
+            SwitchStmt switchSt = (SwitchStmt) crtStmt;
+
+            ArrayList<Exp> list = switchSt.getCaseTbl().keys();
+            Collections.reverse(list);
+
+            IStmt prevIfStmt = switchSt.getDefaultStmt();
+
+            for (Exp exp : list){
+                try{
+                    prevIfStmt = new IfStmt(new ArithExp(new ConstExp(symTable.getValue(switchSt.getVarname())), exp, "-" ), prevIfStmt, switchSt.getCaseTbl().getValue(exp));
+                }catch (Exception e){
+                    System.out.println("Not a good value: in controller switch");
+                }
+            }
+            state.getExeStack().push(prevIfStmt);
+        }
         else if (crtStmt instanceof PrintStmt)
         {
-            IDictionary symTable = state.getSymTable();
+            //IDictionary<String, Integer> symTable = state.getSymTable();
             PrintStmt pStmt = (PrintStmt) crtStmt;
-            IList out = state.getOut();
+            IList<String> out = state.getOut();
             out.add(Integer.toString(pStmt.getExp().eval(state.getSymTable())));
         }
         if(debugFlag)
         {
-            System.out.println("Stack: " + state.getExeStack().toStr() +
-                    "\nSymbol Table: " + state.getSymTable().toStr() +
-                    "\nOutput: " + state.getOut().toStr() +
+            System.out.println("Stack:  " + state.getExeStack().toString() +
+                    "\nSymbol Table: " + state.getSymTable().toString() +
+                    "\nOutput: " + state.getOut().toString() +
                     "\n=========================================================\n");
         }
         if(stk.isEmpty())
         {
-            System.out.println("\nFINISHED\n" + "Output:" + state.getOut().toStr() + "\n");
+            System.out.println("\nFINISHED\n" + "Output:" + state.getOut().toString() + "\n");
         }
     }
 
@@ -142,7 +142,7 @@ public class Controller
     public void allStep()
     {
         PrgState state = repo.getCrtPrg();
-        IStack stk = state.getExeStack();
+        IStack<IStmt> stk = state.getExeStack();
         while(!stk.isEmpty())
         {
             this.oneStep(state);

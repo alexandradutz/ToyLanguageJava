@@ -26,7 +26,7 @@ public class PrintStmt implements IStmt {
     }
 
     @Override
-    public String toStr()
+    public String toString()
     {
         return "print(" + exp.toStr() + ")";
     }

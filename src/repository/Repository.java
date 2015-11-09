@@ -45,8 +45,8 @@ public class Repository implements IRepository {
         IList out = new ArrayList();
         IStmt example = new CompStmt(new AssignStmt("v", new ConstExp(2)), new PrintStmt(new VarExp("v")));
 
-        exeStack.push(example);
-        PrgState inputState = new PrgState(exeStack, symTable, out);
+        //exeStack.push(example);
+        PrgState inputState = new PrgState(exeStack, symTable, out, example);
         this.state[0] = inputState;
         if(exeStack.isEmpty()){
             System.out.println("No input program. Exe Stack IS empty!");
@@ -59,20 +59,16 @@ public class Repository implements IRepository {
     @Override
     public void example2()
     {
-        //a=2+3*5;b=a+1;Print(b)
         IStack exeStack = new ArrayStack();
         IDictionary symTable = new ArrayDictionary();
         IList out = new ArrayList();
-        IStmt prgStmt =  new CompStmt(new AssignStmt("v",new ConstExp(2)),
-                new CompStmt(new AssignStmt("k",new ConstExp(0)),
-                        new CompStmt(new AssignStmt("a",new VarExp("k")),
-                                new CompStmt(new IfStmt(new VarExp("a"),
-                                        new IfStmt(new VarExp("v"),new PrintStmt(new VarExp("v")),new PrintStmt(new VarExp("a"))),
-                                        new CompStmt(new AssignStmt("v",new ConstExp(5)),new PrintStmt(new VarExp("v")))),
-                                        new PrintStmt(new VarExp("v"))))));
+        IStmt prgStmt =  new CompStmt(new AssignStmt("v",new ConstExp(6)),
+                new CompStmt(new WhileStmt(new ArithExp(new VarExp("v"), new ConstExp(4), "-"),
+                new CompStmt(new PrintStmt(new VarExp("v")), new AssignStmt("v", new ArithExp(new VarExp("v"), new ConstExp(1), "-")))),
+                new PrintStmt(new VarExp("v"))));
 
-        exeStack.push(prgStmt);
-        PrgState inputState = new PrgState(exeStack, symTable, out);
+        //exeStack.push(prgStmt);
+        PrgState inputState = new PrgState(exeStack, symTable, out, prgStmt);
         this.state[0] = inputState;
         if(exeStack.isEmpty()){
             System.out.println("No input program. Exe Stack IS empty!");

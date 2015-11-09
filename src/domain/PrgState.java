@@ -5,58 +5,51 @@ import domain.DataStructures.Interface.IList;
 import domain.DataStructures.Interface.IStack;
 import domain.Stmt.IStmt;
 
+import java.util.Arrays;
+import java.util.Stack;
+
 /**
  * Created by Dutzi on 10/14/2015.
  */
 public class PrgState {
     private IStmt origPrg;
-    private IStack exeStack;
-    private IDictionary symTable;
-    private IList out;
+    private IStack<IStmt> exeStack;
+    private IDictionary<String, Integer> symTable;
+    private IList<String> out;
 
-    public PrgState(IStack stk, IDictionary dict, IList lst)
+    public PrgState(IStack<IStmt> stk, IDictionary<String, Integer> dict, IList<String> lst, IStmt prg)
     {
         exeStack = stk;
         symTable = dict;
         out = lst;
+        origPrg = prg;
+        exeStack.push(origPrg);
     }
 
     public String toStr()
     {
-        return "ExeStack = [" + exeStack.toStr() + "]\n" +
-                "SymbolTable = [" + symTable.toStr() + "]\n" +
-                "Output = [" + out.toStr() + "]\n" ;
+        return "ExeStack = [" + exeStack.toString() + "]\n" +
+                "SymbolTable = [" + symTable.toString() + "]\n" +
+                "Output = [" + out.toString() + "]\n" ;
     }
 
     public IStmt getOrigPrg() {
         return origPrg;
     }
 
-    public void setOrigPrg(IStmt origPrg) {
-        this.origPrg = origPrg;
-    }
 
-    public IStack getExeStack() {
+    public IStack<IStmt> getExeStack() {
         return exeStack;
     }
 
-    public void setExeStack(IStack exeStack) {
-        this.exeStack = exeStack;
-    }
 
-    public IDictionary getSymTable() {
+    public IDictionary<String, Integer> getSymTable() {
         return symTable;
     }
 
-    public void setSymTable(IDictionary symTable) {
-        this.symTable = symTable;
-    }
 
-    public IList getOut() {
+    public IList<String> getOut() {
         return out;
     }
 
-    public void setOut(IList out) {
-        this.out = out;
-    }
 }

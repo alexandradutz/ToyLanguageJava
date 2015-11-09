@@ -6,7 +6,7 @@ import domain.Stmt.IStmt;
 /**
  * Created by Dutzi on 10/6/2015.
  */
-public class ArrayStack implements IStack {
+public class ArrayStack implements IStack<IStmt> {
     private IStmt[] elems;
     private int nrElem;
 
@@ -48,12 +48,12 @@ public class ArrayStack implements IStack {
         return null;
     }
 
-    public String toStr()
+    public String toString()
     {
         String res = "";
         for(int i = 0; i < nrElem; i++)
         {
-            res = elems[i].toStr() + " " + res;
+            res = elems[i].toString() + " " + res;
         }
         return res;
     }
