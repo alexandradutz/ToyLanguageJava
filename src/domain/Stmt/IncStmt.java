@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
 import domain.Expression.Exp;
 
 /**
@@ -18,15 +18,6 @@ public class IncStmt implements IStmt {
     @Override
     public String toString() {
         return "inc(" + var.toStr() + ")";
-    }
-
-    @Override
-    public void exec(IDictionary symT) {
-        if(symT.isKey(var.toStr()))
-        {
-            symT.modify(var.toStr(), var.eval(symT) + 1);
-        }
-
     }
 
     public Exp getVar() {

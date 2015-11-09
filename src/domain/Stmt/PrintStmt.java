@@ -1,7 +1,7 @@
 package domain.Stmt;
 
-import domain.DataStructures.Interface.IDictionary;
-import domain.DataStructures.Interface.IList;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.List.IList;
 import domain.Expression.Exp;
 
 /**
@@ -31,8 +31,4 @@ public class PrintStmt implements IStmt {
         return "print(" + exp.toStr() + ")";
     }
 
-    @Override
-    public void exec(IDictionary symT) {
-        out.add(exp.toStr());
-    }
 }

@@ -1,11 +1,13 @@
 package controller;
 
-import domain.DataStructures.Interface.IDictionary;
-import domain.DataStructures.Interface.IList;
-import domain.DataStructures.Interface.IStack;
-import domain.Expression.ArithExp;
-import domain.Expression.ConstExp;
-import domain.Expression.Exp;
+import domain.DataStructures.Dictionary.FullMapException;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.DataStructures.List.FullListException;
+import domain.DataStructures.Stack.EmptyStackException;
+import domain.DataStructures.List.IList;
+import domain.DataStructures.Stack.*;
+import domain.Expression.*;
 import domain.PrgState;
 import domain.Stmt.*;
 import repository.IRepository;
@@ -41,87 +43,89 @@ public class Controller
      * @
      * @param state
      */
-    public void oneStep(PrgState state)
+    public void oneStep(PrgState state) throws StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullMapException, FullListException
     {
         IStack<IStmt> stk = state.getExeStack();
-        if(stk.isEmpty()) System.out.println("stack is empty");
-        IStmt crtStmt = stk.pop();
-        if(crtStmt instanceof CompStmt)
-        {
-            CompStmt crtStmt1 = (CompStmt) crtStmt;
-            stk.push(crtStmt1.getSecond());
-            stk.push(crtStmt1.getFirst());
-        }
-
-        if(crtStmt instanceof AssignStmt)
-        {
-            AssignStmt aStmt = (AssignStmt) crtStmt;
-            String id = aStmt.getId();
-            Exp exp = aStmt.getExp();
-            IDictionary<String, Integer> symTable = state.getSymTable();
-            symTable.add(id, exp.eval(symTable));
-        }
-
-        if(crtStmt instanceof IfStmt)
-        {
-            IfStmt ifSt = (IfStmt) crtStmt;
-            IStmt thenS = ifSt.getThenS();
-            IStmt elseS = ifSt.getElseS();
-            Exp ifExp = ifSt.getExp();
-            IDictionary<String, Integer> symTable = state.getSymTable();
-            if(ifExp.eval(symTable) != 0)
-            {
-                stk.push(thenS);
-            }
-            else
-            {
-                stk.push(elseS);
-            }
-        }
-        if(crtStmt instanceof IncStmt) {
-            IncStmt incStmt = (IncStmt) crtStmt;
-            Exp exp = incStmt.getVar();
-            IDictionary<String, Integer> symTable = state.getSymTable();
-            if (symTable.isKey(exp.toStr())) {
-                symTable.modify(exp.toStr(), exp.eval(symTable) + 1);
-            }
-        }
-        if(crtStmt instanceof WhileStmt)
-        {
-            IDictionary<String, Integer> symTable = state.getSymTable();
-            WhileStmt whileSt = (WhileStmt) crtStmt;
-            if(whileSt.getExpr().eval(symTable) != 0) {
-                IStmt stmt = whileSt.getStmt();
-
-                stk.push(whileSt);
-                stk.push(stmt);
+        try {
+            IStmt crtStmt = stk.pop();
+            if (crtStmt instanceof CompStmt) {
+                CompStmt crtStmt1 = (CompStmt) crtStmt;
+                stk.push(crtStmt1.getSecond());
+                stk.push(crtStmt1.getFirst());
             }
 
-        }
-        if(crtStmt instanceof SwitchStmt){
-            IDictionary<String, Integer> symTable = state.getSymTable();
-            SwitchStmt switchSt = (SwitchStmt) crtStmt;
+            if (crtStmt instanceof AssignStmt) {
+                AssignStmt aStmt = (AssignStmt) crtStmt;
+                String id = aStmt.getId();
+                Exp exp = aStmt.getExp();
+                IDictionary<String, Integer> symTable = state.getSymTable();
+                symTable.add(id, exp.eval(symTable));
+            }
 
-            ArrayList<Exp> list = switchSt.getCaseTbl().keys();
-            Collections.reverse(list);
-
-            IStmt prevIfStmt = switchSt.getDefaultStmt();
-
-            for (Exp exp : list){
-                try{
-                    prevIfStmt = new IfStmt(new ArithExp(new ConstExp(symTable.getValue(switchSt.getVarname())), exp, "-" ), prevIfStmt, switchSt.getCaseTbl().getValue(exp));
-                }catch (Exception e){
-                    System.out.println("Not a good value: in controller switch");
+            if (crtStmt instanceof IfStmt) {
+                IfStmt ifSt = (IfStmt) crtStmt;
+                IStmt thenS = ifSt.getThenS();
+                IStmt elseS = ifSt.getElseS();
+                if(elseS == null){
+                    ifSt.setElseS(new SkipStmt());
+                    stk.push(ifSt);
+                    //return;
+                }
+                Exp ifExp = ifSt.getExp();
+                IDictionary<String, Integer> symTable = state.getSymTable();
+                if (ifExp.eval(symTable) != 0) {
+                    stk.push(thenS);
+                } else {
+                    stk.push(elseS);
+                }
+                //return;
+            }
+            if (crtStmt instanceof IncStmt) {
+                IncStmt incStmt = (IncStmt) crtStmt;
+                Exp exp = incStmt.getVar();
+                IDictionary<String, Integer> symTable = state.getSymTable();
+                if (symTable.isKey(exp.toStr())) {
+                    symTable.add(exp.toStr(), exp.eval(symTable) + 1);
                 }
             }
-            state.getExeStack().push(prevIfStmt);
-        }
-        else if (crtStmt instanceof PrintStmt)
+            if (crtStmt instanceof WhileStmt) {
+                IDictionary<String, Integer> symTable = state.getSymTable();
+                WhileStmt whileSt = (WhileStmt) crtStmt;
+                if (whileSt.getExpr().eval(symTable) != 0) {
+                    IStmt stmt = whileSt.getStmt();
+
+                    stk.push(whileSt);
+                    stk.push(stmt);
+                }
+
+            }
+            if (crtStmt instanceof SwitchStmt) {
+                IDictionary<String, Integer> symTable = state.getSymTable();
+                SwitchStmt switchSt = (SwitchStmt) crtStmt;
+
+                ArrayList<Exp> list = switchSt.getCaseTbl().keys();
+                Collections.reverse(list);
+
+                IStmt prevIfStmt = switchSt.getDefaultStmt();
+
+                for (Exp exp : list) {
+                    try {
+                        prevIfStmt = new IfStmt(new ArithExp(new ConstExp(symTable.getValue(switchSt.getVarname())), exp, "-"), prevIfStmt, switchSt.getCaseTbl().getValue(exp));
+                    } catch (Exception e) {
+                        System.out.println("Not a good value: in controller switch");
+                    }
+                }
+                state.getExeStack().push(prevIfStmt);
+            } else if (crtStmt instanceof PrintStmt) {
+                //IDictionary<String, Integer> symTable = state.getSymTable();
+                PrintStmt pStmt = (PrintStmt) crtStmt;
+                IList<String> out = state.getOut();
+                out.add(Integer.toString(pStmt.getExp().eval(state.getSymTable())));
+            }
+
+        } catch(EmptyStackException ex)
         {
-            //IDictionary<String, Integer> symTable = state.getSymTable();
-            PrintStmt pStmt = (PrintStmt) crtStmt;
-            IList<String> out = state.getOut();
-            out.add(Integer.toString(pStmt.getExp().eval(state.getSymTable())));
+            throw new StatementExecutionException();
         }
         if(debugFlag)
         {
@@ -130,16 +134,12 @@ public class Controller
                     "\nOutput: " + state.getOut().toString() +
                     "\n=========================================================\n");
         }
-        if(stk.isEmpty())
-        {
-            System.out.println("\nFINISHED\n" + "Output:" + state.getOut().toString() + "\n");
-        }
     }
 
     /**
      *
      */
-    public void allStep()
+    public void allStep() throws StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullListException, FullMapException
     {
         PrgState state = repo.getCrtPrg();
         IStack<IStmt> stk = state.getExeStack();

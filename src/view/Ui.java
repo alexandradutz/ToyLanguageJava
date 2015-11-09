@@ -1,14 +1,17 @@
 package view;
 
 import controller.Controller;
-import domain.DataStructures.Interface.IDictionary;
-import domain.DataStructures.LibDataStructs.LibDictionary;
-import domain.DataStructures.LibDataStructs.LibList;
-import domain.DataStructures.LibDataStructs.LibStack;
-import domain.Expression.*;
-import domain.Stmt.IStmt;
+import controller.StatementExecutionException;
+import domain.DataStructures.Dictionary.FullMapException;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.DataStructures.Dictionary.LibDictionary;
+import domain.DataStructures.List.FullListException;
+import domain.DataStructures.List.LibList;
+import domain.DataStructures.Stack.LibStack;
 import domain.PrgState;
 import domain.Stmt.*;
+import domain.Expression.*;
 import repository.IRepository;
 import repository.Repository;
 
@@ -57,63 +60,106 @@ public class Ui {
 
 
     private void allStep() {
-        ctrl.allStep();
+
+        try{
+            ctrl.allStep();
+        }catch (StatementExecutionException e){
+            System.out.println("\nFINISHED\n");
+        }
+        catch (VariableNotDefinedException e){
+            System.out.println("A variable is not defined!");
+        }
+        catch (DivisionByZeroException e){
+            System.out.println("Division by zero;");
+        }
+        catch (FullListException e){
+            System.out.println("There's no room for another output!");
+        }
+        catch (FullMapException e){
+            System.out.println("Symbol Table is full!");
+        }
+        catch (IsNotKeyException e){
+            System.out.println("There is no such key!");
+        }
     }
 
     private void oneStep() {
-        ctrl.oneStep(ctrl.getRepo().getCrtPrg());
+        try{
+            ctrl.oneStep(ctrl.getRepo().getCrtPrg());
+        } catch (StatementExecutionException e){
+        System.out.println("\nFINISHED\n");
+        }
+        catch (VariableNotDefinedException e){
+            System.out.println("A variable is not defined!");
+        }
+        catch (DivisionByZeroException e){
+            System.out.println("Division by zero;");
+        }
+        catch (FullListException e){
+            System.out.println("There's no room for another output!");
+        }
+        catch (FullMapException e){
+            System.out.println("Symbol Table is full!");
+        }
+        catch (IsNotKeyException e) {
+            System.out.println("There is no such key!");
+        }
     }
 
     private void printPrg() {
         System.out.println(ctrl.getRepo().getCrtPrg().toStr());
     }
 
-    /**
-     * @throws Exception
-     */
+    private int readInt() throws InputDataTypeException{
+        return reader.nextInt();
+    }
+
     private void initialMenu() {
         int option;
         System.out.println(mainMenu);
         System.out.println("Choose an option:");
-        option = reader.nextInt();
-
-        if (option != 0 && crtPrg == null) {
-            switch (option) {
-                case 1: {
-                    inputProgram();
-                    //ctrl.getRepo().example1();
-                    //ctrl.getRepo().example2();
-                    initialMenu();
-                    break;
+        try {
+            option = readInt();
+            if (option != 0 && crtPrg == null) {
+                switch (option) {
+                    case 1: {
+                        inputProgram();
+                        //ctrl.getRepo().example1();
+                        //ctrl.getRepo().example2();
+                        initialMenu();
+                        break;
+                    }
+                    case 2: {
+                        printPrg();
+                        initialMenu();
+                        break;
+                    }
+                    case 3: {
+                        oneStep();
+                        initialMenu();
+                        break;
+                    }
+                    case 4: {
+                        allStep();
+                        initialMenu();
+                        break;
+                    }
+                    case 5: {
+                        ctrl.changeDebugFlag();
+                        System.out.println("Debug mode: " + ctrl.isDebugFlag() + "\n");
+                        initialMenu();
+                        break;
+                    }
+                    case 0:
+                        break;
+                    default:
+                        System.out.println("Invalid option, please try again!\n");
                 }
-                case 2: {
-                    printPrg();
-                    initialMenu();
-                    break;
-                }
-                case 3: {
-                    oneStep();
-                    initialMenu();
-                    break;
-                }
-                case 4: {
-                    allStep();
-                    initialMenu();
-                    break;
-                }
-                case 5: {
-                    ctrl.changeDebugFlag();
-                    System.out.println("Debug mode: " + ctrl.isDebugFlag() + "\n");
-                    initialMenu();
-                    break;
-                }
-                case 0:
-                    break;
-                default:
-                    System.out.println("Invalid option, please try again!\n");
             }
-
         }
+        catch (InputDataTypeException e){
+            System.out.println("Invalid option. Insert a number!");
+    }
     }
 
     public void run() {
@@ -134,7 +180,7 @@ public class Ui {
     /**
      * @return
      */
-    private AssignStmt assignStmt() {
+    private AssignStmt assignStmt() throws InputDataTypeException {
         System.out.println("Var name:");
         String id = reader.next();
         System.out.println("Value: ");
@@ -179,7 +225,7 @@ public class Ui {
         return new WhileStmt(exp, stmt);
     }
 
-    private SwitchStmt switchStmt(){
+    private SwitchStmt switchStmt()throws InputDataTypeException{
         System.out.println("Varname: ");
         String varname = reader.next();
         Exp exp;
@@ -191,7 +237,13 @@ public class Ui {
             exp = inputExpression();
             System.out.println("Statement: ");
             stmt = inputStatement();
-            tbl.add(exp, stmt);
+            try{
+                tbl.add(exp, stmt);
+            }
+            catch (FullMapException e) {
+                System.out.println("Symbol Table is full!");
+            }
+
             System.out.println("Another CASE? (y/n)");
             opt = reader.next();
             if(opt.equals("n")){break;}
@@ -207,46 +259,52 @@ public class Ui {
         int option;
         System.out.println(statementMenu);
         System.out.println("Choose an option:");
-        option = reader.nextInt();
-        IStmt current;
+        try {
+            option = readInt();
+            IStmt current;
 
-        switch (option) { //comp stmt
-            case 1: {
-                current = compStmt();
-                break;
+            switch (option) { //comp stmt
+                case 1: {
+                    current = compStmt();
+                    break;
+                }
+                case 2: { //assign stmt
+                    current = assignStmt();
+                    break;
+                }
+                case 3: {
+                    current = ifStmt();
+                    break;
+                }
+                case 4: {
+                    current = printStmt();
+                    break;
+                }
+                case 5: {
+                    current = incStmt();
+                    break;
+                }
+                case 6: {
+                    current = whileStmt();
+                    break;
+                }
+                case 7: {
+                    current = switchStmt();
+                    break;
+                }
+                default:
+                    System.out.println("Invalid option! ");
+                    current = inputStatement();
             }
-            case 2: { //assign stmt
-                current = assignStmt();
-                break;
-            }
-            case 3: {
-                current = ifStmt();
-                break;
-            }
-            case 4: {
-                current = printStmt();
-                break;
-            }
-            case 5: {
-                current = incStmt();
-                break;
-            }
-            case 6: {
-                current = whileStmt();
-                break;
-            }
-            case 7: {
-                current = switchStmt();
-                break;
-            }
-            default:
-                System.out.println("Invalid option! ");
-                current = inputStatement();
+            return current;
         }
-        return current;
+        catch (InputDataTypeException e){
+            System.out.println("Invalid input, try again!");
+        }
+        return inputStatement();
     }
 
-    private ArithExp arithExp() {
+    private ArithExp arithExp() throws InputDataTypeException {
         System.out.println("Operators: +, -, *, /\n");
         System.out.println("Operator: ");
         String operator = reader.next();
@@ -257,19 +315,19 @@ public class Ui {
         return new ArithExp(left, right, operator);
     }
 
-    private ConstExp constExp() {
+    private ConstExp constExp() throws InputDataTypeException {
         System.out.println("Constant: ");
-        int constant = reader.nextInt();
+        int constant = readInt();
         return new ConstExp(constant);
     }
 
-    private VarExp varExp() {
+    private VarExp varExp() throws InputDataTypeException {
         System.out.println("Variable id: ");
         String id = reader.next();
         return new VarExp(id);
     }
 
-    private BoolExp boolExp() {
+    private BoolExp boolExp() throws InputDataTypeException {
         System.out.println("Operators: <, <=, >, >=, ==, !=\n");
         System.out.println("Operator:");
         String operator = reader.next();
@@ -280,7 +338,7 @@ public class Ui {
         return new BoolExp(left, right, operator);
     }
 
-    private  LogicalExp logicalExp(){
+    private  LogicalExp logicalExp() throws InputDataTypeException {
         System.out.println("Operators: &&, ||, !\n");
         System.out.println("Operator:");
         String operator = reader.next();
@@ -294,9 +352,9 @@ public class Ui {
         return new LogicalExp(left, operator);
     }
 
-    private  ReadExp readExp(){
+    private ReadExp readExp()throws InputDataTypeException {
         System.out.println("Introduce an integer for ToyLanguage ");
-        Integer no = reader.nextInt();
+        Integer no = readInt();
         return new ReadExp(no);
     }
 
@@ -304,60 +362,57 @@ public class Ui {
         int option;
         System.out.println(expressionMenu);
         System.out.println("Choose an option: ");
-        option = reader.nextInt();
-        Exp expression;
-
-        switch (option) {
-            case 1: {
-                expression = arithExp();
-                break;
+        try {
+            Exp expression;
+            option = readInt();
+            switch (option) {
+                case 1: {
+                    expression = arithExp();
+                    break;
+                }
+                case 2: {
+                    expression = constExp();
+                    break;
+                }
+                case 3: {
+                    expression = varExp();
+                    break;
+                }
+                case 4: {
+                    expression = boolExp();
+                    break;
+                }
+                case 5: {
+                    expression = logicalExp();
+                    break;
+                }
+                case 6: {
+                    expression = readExp();
+                    break;
+                }
+                default: {
+                    System.out.println("Invalid option!");
+                    expression = inputExpression();
+                }
             }
-            case 2: {
-                expression = constExp();
-                break;
-            }
-            case 3: {
-                expression = varExp();
-                break;
-            }
-            case 4: {
-                expression = boolExp();
-                break;
-            }
-            case 5:{
-                expression = logicalExp();
-                break;
-            }
-            case 6: {
-                expression = readExp();
-                break;
-            }
-            default: {
-                System.out.println("Invalid option!");
-                expression = inputExpression();
-            }
+            return expression;
         }
-        return expression;
+        catch (InputDataTypeException e){
+            System.out.println("Invalid input, try again!");
+        }
+        return inputExpression();
     }
 
     private void inputProgram() {
         IStmt programStmt = inputStatement();
-        //LibStack<> stk = new LibStack<IStmt>();
-        //LibDictionary<> dict = new LibDictionary<String, Integer>();
-        //LibList lst = new LibList<String>();
+        /**        */
+        LibStack stk = new LibStack<>();
+        LibDictionary dict = new LibDictionary<>();
+        LibList lst = new LibList<>();
+         //stk.push(programStmt);
 
-        //stk.push(programStmt);
-        PrgState crtPrg = new PrgState(new LibStack<>(), new LibDictionary<>(), new LibList<>(), programStmt);
+        PrgState crtPrg = new PrgState(stk,  dict, lst, programStmt);
 
         ctrl.getRepo().setCrtPrg(crtPrg);
-        if (ctrl.getRepo().getCrtPrg().getExeStack().isEmpty()) {
-            System.out.println("No input program. Exe Stack IS empty, in UI!");
-        } else {
-            System.out.println("Exe Stack IS NOT empty, in UI");
-
-            System.out.println(crtPrg.toStr());
-
-        }
-
     }
 }

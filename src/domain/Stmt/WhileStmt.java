@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
 import domain.Expression.Exp;
 
 /**
@@ -18,11 +18,6 @@ public class WhileStmt implements IStmt {
     @Override
     public String toString() {
         return "WHILE(" + expr.toStr() + ") {" + stmt.toString() + "}";
-    }
-
-    @Override
-    public void exec(IDictionary symT) {
-        return;
     }
 
     public Exp getExpr() {

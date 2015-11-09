@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
 import domain.Expression.Exp;
 /**
  * Created by Dutzi on 11/9/2015.
@@ -20,21 +20,16 @@ public class SwitchStmt implements IStmt {
     }
 
     @Override
-    public void exec(IDictionary symT) {
-        return;
-    }
-
-    @Override
     public String toString() {
-        String res = "Switch (" + varname.toString() + ") ";
+        String res = " Switch (" + varname.toString() + ") ";
         try {
             for (Exp e : caseTbl.keys()) {
-                res = res + "case " + e.toStr() + ": " + caseTbl.getValue(e).toString();
+                res = res + " case " + e.toStr() + ": " + caseTbl.getValue(e).toString();
             }
         }catch (Exception e){
             System.out.println("Input value is wrong.");
         }
-        res = res + "default: " + defaultStmt.toString();
+        res = res + " default: " + defaultStmt.toString();
         return res;
     }
 

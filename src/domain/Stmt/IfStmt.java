@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
 import domain.Expression.Exp;
 
 /**
@@ -25,21 +25,6 @@ public class IfStmt implements IStmt {
         return "IF (" + exp.toStr() + ") THEN (" + thenS.toString() + ") ELSE (" + elseS.toString() + ")";
     }
 
-    /**
-     *
-     * @param symT
-     */
-    @Override
-    public void exec(IDictionary symT) {
-        if(exp.eval(symT) != 0)
-        {
-            thenS.exec(symT);
-        }
-        else
-        {
-            elseS.exec(symT);
-        }
-    }
 
     public Exp getExp() {
         return exp;

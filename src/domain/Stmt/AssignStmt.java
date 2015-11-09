@@ -1,6 +1,6 @@
 package domain.Stmt;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
 import domain.Expression.Exp;
 
 /**
@@ -31,15 +31,6 @@ public class AssignStmt implements IStmt {
     public String toString()
     {
         return id + "=" + exp.toStr();
-    }
-
-    /**
-     *
-     * @param symT
-     */
-    @Override
-    public void exec(IDictionary symT) {
-        symT.add(id, exp.eval(symT));
     }
 
     /**
