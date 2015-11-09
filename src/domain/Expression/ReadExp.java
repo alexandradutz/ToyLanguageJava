@@ -1,8 +1,6 @@
 package domain.Expression;
 
-import domain.DataStructures.Interface.IDictionary;
-
-import java.util.Scanner;
+import domain.DataStructures.Dictionary.IDictionary;
 
 
 /**

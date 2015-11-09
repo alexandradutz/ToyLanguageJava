@@ -1,9 +1,11 @@
 package repository;
 
-import domain.DataStructures.*;
-import domain.DataStructures.Interface.IDictionary;
-import domain.DataStructures.Interface.IList;
-import domain.DataStructures.Interface.IStack;
+import domain.DataStructures.Dictionary.ArrayDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.List.ArrayList;
+import domain.DataStructures.List.IList;
+import domain.DataStructures.Stack.ArrayStack;
+import domain.DataStructures.Stack.IStack;
 import domain.Expression.ArithExp;
 import domain.Expression.ConstExp;
 import domain.Expression.VarExp;
@@ -16,7 +18,7 @@ import domain.Stmt.*;
 public class Repository implements IRepository {
     private PrgState[] state;
 
-    public PrgState[] getState() {
+    public PrgState[] getState(){
         return state;
     }
 
@@ -48,11 +50,11 @@ public class Repository implements IRepository {
         //exeStack.push(example);
         PrgState inputState = new PrgState(exeStack, symTable, out, example);
         this.state[0] = inputState;
-        if(exeStack.isEmpty()){
-            System.out.println("No input program. Exe Stack IS empty!");
-        }else{
-            System.out.println("Exe Stack IS NOT empty");
-        }
+        //if(exeStack.isEmpty()){
+        //    System.out.println("No input program. Exe Stack IS empty!");
+       // }else{
+       //     System.out.println("Exe Stack IS NOT empty");
+       // }
 
     }
 
@@ -69,12 +71,12 @@ public class Repository implements IRepository {
 
         //exeStack.push(prgStmt);
         PrgState inputState = new PrgState(exeStack, symTable, out, prgStmt);
-        this.state[0] = inputState;
-        if(exeStack.isEmpty()){
-            System.out.println("No input program. Exe Stack IS empty!");
-        }else{
-            System.out.println("Exe Stack IS NOT empty");
-        }
+        //this.state[0] = inputState;
+       // if(exeStack.isEmpty()){
+        //    System.out.println("No input program. Exe Stack IS empty!");
+       // }else{
+        //    System.out.println("Exe Stack IS NOT empty");
+       // }
 
     }
 

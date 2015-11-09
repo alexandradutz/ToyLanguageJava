@@ -1,6 +1,5 @@
-package domain.DataStructures.LibDataStructs;
+package domain.DataStructures.List;
 
-import domain.DataStructures.Interface.IList;
 import java.util.Vector;
 
 /**
@@ -9,12 +8,16 @@ import java.util.Vector;
 public class LibList<T> implements IList<T> {
     private Vector<T> list;
 
+    /**
+     *Constructs an empty list with an initial capacity of ten.
+     */
     public LibList(){
-        this.list = new Vector<>(20);
+        this.list = new Vector<>();
     }
 
     @Override
-    public void add(T o) {
+    public void add(T o) throws FullListException{
+        if(this.list.size() == 10) throw new FullListException();
         list.addElement(o);
     }
 
@@ -29,8 +32,10 @@ public class LibList<T> implements IList<T> {
     }
 
     @Override
-    public T get(int i) {
-        return list.get(i);
+    public T get(int i) throws IndexOutOfBoundException {
+        if((i >= 0) && (i < this.list.size()))
+            return list.get(i);
+        throw new IndexOutOfBoundException();
     }
 
     @Override

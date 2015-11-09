@@ -1,6 +1,7 @@
 package domain.Expression;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
 
 /**
  * Created by Dutzi on 10/13/2015.
@@ -26,12 +27,17 @@ public class ArithExp extends Exp {
     }
 
     @Override
-    public int eval(IDictionary tbl) {
+    public int eval(IDictionary tbl)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
         switch (opt){
             case "+": return (exp1.eval(tbl) + exp2.eval(tbl));
             case "-": return (exp1.eval(tbl) - exp2.eval(tbl));
             case "*": return (exp1.eval(tbl) * exp2.eval(tbl));
-            case "/": return (exp1.eval(tbl) / exp2.eval(tbl));
+            case "/":{
+                if(exp2.eval(tbl) != 0)
+                    return (exp1.eval(tbl) / exp2.eval(tbl));
+                throw new DivisionByZeroException();
+            }
+
             default: return eval(tbl);
         }
     }
@@ -39,10 +45,10 @@ public class ArithExp extends Exp {
     @Override
     public String toStr() {
         switch (opt){
-            case "+": return "( " + exp1.toStr() + "+" + exp2.toStr()+ " )";
-            case "-": return "( " + exp1.toStr() + "-" + exp2.toStr()+ " )";
-            case "*": return "( " + exp1.toStr() + "*" + exp2.toStr()+ " )";
-            case "/": return "( " + exp1.toStr() + "/" + exp2.toStr()+ " )";
+            case "+": return " (" + exp1.toStr() + "+" + exp2.toStr()+ ") ";
+            case "-": return " (" + exp1.toStr() + "-" + exp2.toStr()+ ") ";
+            case "*": return " (" + exp1.toStr() + "*" + exp2.toStr()+ ") ";
+            case "/": return " (" + exp1.toStr() + "/" + exp2.toStr()+ ") ";
             default: return toStr();
         }
     }

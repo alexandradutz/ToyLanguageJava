@@ -1,6 +1,7 @@
 package domain.Expression;
 
-import domain.DataStructures.Interface.IDictionary;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
 
 /**
  * Created by Dutzi on 11/8/2015.
@@ -27,7 +28,7 @@ public class BoolExp extends Exp {
     }
 
     @Override
-    public int eval(IDictionary tbl) {
+    public int eval(IDictionary tbl)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
         switch (opt) {
             case "<":
                 if (exp1.eval(tbl) < exp2.eval(tbl)) {

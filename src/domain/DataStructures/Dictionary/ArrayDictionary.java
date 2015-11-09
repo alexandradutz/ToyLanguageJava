@@ -1,9 +1,5 @@
-package domain.DataStructures;
+package domain.DataStructures.Dictionary;
 
-import domain.DataStructures.Interface.IDictionary;
-import exception.MyException;
-
-import java.util.*;
 import java.util.ArrayList;
 
 /**
@@ -27,7 +23,7 @@ public class ArrayDictionary implements IDictionary<String, Integer>{
         return nrElem == 0;
     }
 
-    public void add(String key, Integer value){
+    public void add(String key, Integer value) throws FullMapException{
         if( nrElem == elems.length){
             resize();
         }
@@ -53,14 +49,14 @@ public class ArrayDictionary implements IDictionary<String, Integer>{
         keys = k;
     }
 
-    public Integer getValue(String key) throws MyException {
+    public Integer getValue(String key) throws IsNotKeyException{
         int i;
         for(i = 0; i < nrElem; i++){
             if(keys[i].equals(key)){
                 return this.elems[i];
             }
         }
-        throw new MyException("Key not found");
+        throw new IsNotKeyException();
     }
 
     public int size(){
@@ -83,20 +79,6 @@ public class ArrayDictionary implements IDictionary<String, Integer>{
             res = res + ", " + keys[i] + ":" + elems[i];
         }
         return res;
-    }
-
-    @Override
-    public void modify(String key, Integer value) {
-        int i;
-        for(i = 0; i < nrElem; i++)
-        {
-            if(keys[i].equals(key))
-            {
-                elems[i] = value;
-                break;
-            }
-        }
-
     }
 
     @Override

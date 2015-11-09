@@ -1,6 +1,4 @@
-package domain.DataStructures.LibDataStructs;
-
-import domain.DataStructures.Interface.IStack;
+package domain.DataStructures.Stack;
 
 import java.util.Stack;
 
@@ -15,12 +13,14 @@ public class LibStack<T> implements IStack<T>{
     }
 
     @Override
-    public void push(T o) {
+    public void push(T o){
+
         stack.push(o);
     }
 
     @Override
-    public T pop() {
+    public T pop() throws EmptyStackException {
+        if (this.stack.isEmpty()) throw new EmptyStackException();
         return stack.pop();
     }
 
@@ -30,7 +30,8 @@ public class LibStack<T> implements IStack<T>{
     }
 
     @Override
-    public T top() {
+    public T top()throws EmptyStackException {
+        if (this.stack.isEmpty()) throw new EmptyStackException();
         return stack.peek();
     }
 

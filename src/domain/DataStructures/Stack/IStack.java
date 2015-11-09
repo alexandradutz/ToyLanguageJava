@@ -1,4 +1,4 @@
-package domain.DataStructures.Interface;
+package domain.DataStructures.Stack;
 
 /**
  * Created by Dutzi on 10/6/2015.
@@ -6,8 +6,8 @@ package domain.DataStructures.Interface;
 
 public interface IStack<T>{
     public void push(T o);
-    public T pop();
+    public T pop() throws EmptyStackException;
     public boolean isEmpty();
-    public T top();
+    public T top() throws EmptyStackException;
     public String toString();
 }

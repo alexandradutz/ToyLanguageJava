@@ -1,6 +1,5 @@
-package domain.DataStructures;
+package domain.DataStructures.Stack;
 
-import domain.DataStructures.Interface.IStack;
 import domain.Stmt.IStmt;
 
 /**

@@ -1,6 +1,6 @@
-package domain.DataStructures;
+package domain.DataStructures.List;
 
-import domain.DataStructures.Interface.IList;
+import domain.DataStructures.List.IList;
 
 /**
  * Created by Dutzi on 10/11/2015.

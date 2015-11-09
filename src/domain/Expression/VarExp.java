@@ -1,8 +1,7 @@
 package domain.Expression;
 
-import domain.DataStructures.Interface.IDictionary;
-import exception.MyException;
-
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
 /**
  * Created by Dutzi on 10/13/2015.
  */
@@ -15,15 +14,10 @@ public class VarExp extends Exp {
 
 
     @Override
-    public int eval(IDictionary tbl) {
-        int value;
-        try {
-            value = (int) tbl.getValue(id);
-        } catch (MyException e) {
-            System.out.println(e.toString());
-            return 0;
-        }
-        return value;
+    public int eval(IDictionary tbl)  throws IsNotKeyException, VariableNotDefinedException {
+        if(tbl.isKey(id))
+                return (int) tbl.getValue(id);
+        throw new VariableNotDefinedException();
     }
 
     @Override

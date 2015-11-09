@@ -1,7 +1,5 @@
-package domain.DataStructures.LibDataStructs;
+package domain.DataStructures.Dictionary;
 
-import domain.DataStructures.Interface.IDictionary;
-import exception.MyException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +10,9 @@ import java.util.HashMap;
 public class LibDictionary <K, V> implements IDictionary<K, V> {
     private HashMap<K, V> dictionary;
 
+    /**
+     * Constructs an empty HashMap with the default initial capacity (16).
+     */
     public LibDictionary(){
         this.dictionary = new HashMap<>();
     }
@@ -22,12 +23,14 @@ public class LibDictionary <K, V> implements IDictionary<K, V> {
     }
 
     @Override
-    public void add(K key, V value) {
+    public void add(K key, V value) throws FullMapException {
+        if(this.dictionary.size() == 16) throw new FullMapException();
         dictionary.put(key, value);
     }
 
     @Override
-    public V getValue(K key) throws MyException {
+    public V getValue(K key) throws IsNotKeyException {
+        if(!this.dictionary.containsKey(key)) throw  new IsNotKeyException();
         return dictionary.get(key);
     }
 
@@ -49,10 +52,6 @@ public class LibDictionary <K, V> implements IDictionary<K, V> {
         return dictionary.toString();
     }
 
-    @Override
-    public void modify(K key, V value) {
-        dictionary.put(key, value);
-    }
 
     public ArrayList<K> keys() {
         ArrayList<K> arList = new ArrayList<K>();

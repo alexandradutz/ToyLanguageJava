@@ -1,12 +1,9 @@
 package domain;
 
-import domain.DataStructures.Interface.IDictionary;
-import domain.DataStructures.Interface.IList;
-import domain.DataStructures.Interface.IStack;
+import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.List.IList;
+import domain.DataStructures.Stack.IStack;
 import domain.Stmt.IStmt;
-
-import java.util.Arrays;
-import java.util.Stack;
 
 /**
  * Created by Dutzi on 10/14/2015.
