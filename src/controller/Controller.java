@@ -62,8 +62,8 @@ public class Controller
                 symTable.add(id, exp.eval(symTable));
             }
 
-            if (crtStmt instanceof IfStmt) {
-                IfStmt ifSt = (IfStmt) crtStmt;
+            if (crtStmt instanceof IfSkipStmt) {
+                IfSkipStmt ifSt = (IfSkipStmt) crtStmt;
                 IStmt thenS = ifSt.getThenS();
                 IStmt elseS = ifSt.getElseS();
                 if(elseS == null){
@@ -80,12 +80,27 @@ public class Controller
                 }
                 //return;
             }
+
+            if (crtStmt instanceof IfStmt) {
+                IfStmt ifSt = (IfStmt) crtStmt;
+                IStmt thenS = ifSt.getThenS();
+                IStmt elseS = ifSt.getElseS();
+                Exp ifExp = ifSt.getExp();
+                IDictionary<String, Integer> symTable = state.getSymTable();
+                if (ifExp.eval(symTable) != 0) {
+                    stk.push(thenS);
+                } else {
+                    stk.push(elseS);
+                }
+                //return;
+            }
             if (crtStmt instanceof IncStmt) {
                 IncStmt incStmt = (IncStmt) crtStmt;
                 Exp exp = incStmt.getVar();
                 IDictionary<String, Integer> symTable = state.getSymTable();
                 if (symTable.isKey(exp.toStr())) {
                     symTable.add(exp.toStr(), exp.eval(symTable) + 1);
+
                 }
             }
             if (crtStmt instanceof WhileStmt) {
@@ -104,7 +119,6 @@ public class Controller
                 SwitchStmt switchSt = (SwitchStmt) crtStmt;
 
                 ArrayList<Exp> list = switchSt.getCaseTbl().keys();
-                Collections.reverse(list);
 
                 IStmt prevIfStmt = switchSt.getDefaultStmt();
 
@@ -117,7 +131,6 @@ public class Controller
                 }
                 state.getExeStack().push(prevIfStmt);
             } else if (crtStmt instanceof PrintStmt) {
-                //IDictionary<String, Integer> symTable = state.getSymTable();
                 PrintStmt pStmt = (PrintStmt) crtStmt;
                 IList<String> out = state.getOut();
                 out.add(Integer.toString(pStmt.getExp().eval(state.getSymTable())));

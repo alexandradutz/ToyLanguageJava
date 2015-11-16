@@ -10,4 +10,5 @@ public interface IRepository {
     public void setCrtPrg(PrgState state);
     public void example1();
     public void example2();
+    public void serialize();
 }

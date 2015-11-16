@@ -9,7 +9,7 @@ public class LibStack<T> implements IStack<T>{
     private Stack<T> stack;
 
     public LibStack(){
-        stack = new Stack<>();
+        this.stack = new Stack<>();
     }
 
     @Override

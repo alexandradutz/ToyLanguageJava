@@ -1,6 +1,7 @@
 package domain.Stmt;
 
 import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.Expression.Exp;
 /**
  * Created by Dutzi on 11/9/2015.
@@ -26,7 +27,7 @@ public class SwitchStmt implements IStmt {
             for (Exp e : caseTbl.keys()) {
                 res = res + " case " + e.toStr() + ": " + caseTbl.getValue(e).toString();
             }
-        }catch (Exception e){
+        }catch (IsNotKeyException e){
             System.out.println("Input value is wrong.");
         }
         res = res + " default: " + defaultStmt.toString();

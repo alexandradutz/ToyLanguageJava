@@ -15,6 +15,9 @@ import domain.Expression.*;
 import repository.IRepository;
 import repository.Repository;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 /**
@@ -49,7 +52,8 @@ public class Ui {
             "4. Print Statement\n" +
             "5. Increment Statement\n" +
             "6. While Statement\n" +
-            "7. Switch Statement\n";
+            "7. Switch Statement\n" +
+            "8. IF Then Skip Statement\n";
     private String expressionMenu = "\nEXPRESSION MENU\n" +
             "1. Arithmetical expression\n" +
             "2. Constant expression\n" +
@@ -110,21 +114,38 @@ public class Ui {
         System.out.println(ctrl.getRepo().getCrtPrg().toStr());
     }
 
-    private int readInt() throws InputDataTypeException{
-        return reader.nextInt();
+    private void print(String message) {
+        System.out.println(message);
     }
 
-    private void initialMenu() {
+    private String readString(String message) {
+        try {
+            print(message);
+            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+            return bufferRead.readLine();
+        } catch (IOException e) {
+            print(e.getMessage());
+        }
+        return "";
+    }
+
+    private Integer readInteger(String message) throws InputDataTypeException {
+        try {
+            return Integer.parseInt(readString(message));
+        } catch (NumberFormatException e) {
+            throw new InputDataTypeException();
+        }
+    }
+    private void initialMenu()  {
         int option;
         System.out.println(mainMenu);
-        System.out.println("Choose an option:");
         try {
-            option = readInt();
+            option = readInteger("Choose an option:");
             if (option != 0 && crtPrg == null) {
                 switch (option) {
                     case 1: {
-                        inputProgram();
-                        //ctrl.getRepo().example1();
+                        //inputProgram();
+                        ctrl.getRepo().example1();
                         //ctrl.getRepo().example2();
                         initialMenu();
                         break;
@@ -158,12 +179,16 @@ public class Ui {
             }
         }
         catch (InputDataTypeException e){
-            System.out.println("Invalid option. Insert a number!");
+            print("Invalid option.");
+            initialMenu();
     }
+
     }
 
     public void run() {
         initialMenu();
+
+
     }
 
     /**
@@ -199,6 +224,14 @@ public class Ui {
         System.out.println("Else statement: ");
         IStmt elseS = inputStatement();
         return new IfStmt(expression, thenS, elseS);
+    }
+
+    private IfSkipStmt ifSkipStmt() {
+        System.out.println("Expression: ");
+        Exp expression = inputExpression();
+        System.out.println("Then statement: ");
+        IStmt thenS = inputStatement();
+        return new IfSkipStmt(expression, thenS);
     }
 
     /**
@@ -258,9 +291,8 @@ public class Ui {
     private IStmt inputStatement() {
         int option;
         System.out.println(statementMenu);
-        System.out.println("Choose an option:");
         try {
-            option = readInt();
+            option = readInteger("Choose an option:");
             IStmt current;
 
             switch (option) { //comp stmt
@@ -316,8 +348,7 @@ public class Ui {
     }
 
     private ConstExp constExp() throws InputDataTypeException {
-        System.out.println("Constant: ");
-        int constant = readInt();
+        int constant = readInteger("Constant: ");
         return new ConstExp(constant);
     }
 
@@ -353,18 +384,16 @@ public class Ui {
     }
 
     private ReadExp readExp()throws InputDataTypeException {
-        System.out.println("Introduce an integer for ToyLanguage ");
-        Integer no = readInt();
+        Integer no = readInteger("Introduce an integer for ToyLanguage ");
         return new ReadExp(no);
     }
 
     private Exp inputExpression() {
         int option;
         System.out.println(expressionMenu);
-        System.out.println("Choose an option: ");
         try {
             Exp expression;
-            option = readInt();
+            option = readInteger("Choose an option: ");
             switch (option) {
                 case 1: {
                     expression = arithExp();
@@ -398,7 +427,7 @@ public class Ui {
             return expression;
         }
         catch (InputDataTypeException e){
-            System.out.println("Invalid input, try again!");
+            print("Invalid input, try again!");
         }
         return inputExpression();
     }
