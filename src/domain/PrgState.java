@@ -5,10 +5,12 @@ import domain.DataStructures.List.IList;
 import domain.DataStructures.Stack.IStack;
 import domain.Stmt.IStmt;
 
+import java.io.Serializable;
+
 /**
  * Created by Dutzi on 10/14/2015.
  */
-public class PrgState {
+public class PrgState implements Serializable {
     private IStmt origPrg;
     private IStack<IStmt> exeStack;
     private IDictionary<String, Integer> symTable;

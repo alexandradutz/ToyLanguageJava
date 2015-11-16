@@ -11,6 +11,7 @@ import domain.Expression.*;
 import domain.PrgState;
 import domain.Stmt.*;
 import repository.IRepository;
+import repository.RepositoryException;
 
 import java.util.*;
 
@@ -29,22 +30,17 @@ public class Controller
         debugFlag = !debugFlag;
     }
 
-    /**
-     *
-     * @param repo
-     */
+
     public Controller(IRepository repo)
     {
         this.repo = repo;
+
     }
 
 
-    /**
-     * @
-     * @param state
-     */
-    public void oneStep(PrgState state) throws StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullMapException, FullListException
+    public void oneStep() throws RepositoryException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullMapException, FullListException
     {
+        PrgState state = repo.getCrtPrg();
         IStack<IStmt> stk = state.getExeStack();
         try {
             IStmt crtStmt = stk.pop();
@@ -152,13 +148,13 @@ public class Controller
     /**
      *
      */
-    public void allStep() throws StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullListException, FullMapException
+    public void allStep() throws RepositoryException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullListException, FullMapException
     {
         PrgState state = repo.getCrtPrg();
         IStack<IStmt> stk = state.getExeStack();
         while(!stk.isEmpty())
         {
-            this.oneStep(state);
+            this.oneStep();
         }
     }
 

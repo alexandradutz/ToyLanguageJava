@@ -7,6 +7,7 @@ import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.DataStructures.Dictionary.LibDictionary;
 import domain.DataStructures.List.FullListException;
+import domain.DataStructures.List.IList;
 import domain.DataStructures.List.LibList;
 import domain.DataStructures.Stack.LibStack;
 import domain.PrgState;
@@ -14,6 +15,7 @@ import domain.Stmt.*;
 import domain.Expression.*;
 import repository.IRepository;
 import repository.Repository;
+import repository.RepositoryException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,17 +35,16 @@ public class Ui {
      * @
      */
     public Ui() {
-        repo = new Repository();
-        ctrl = new Controller(repo);
+        //repo = new Repository();
+        //ctrl = new Controller(repo);
         reader = new Scanner(System.in);
     }
 
     private String mainMenu = "\nMAIN MENU\n" +
             "1. Input a program\n" +
-            "2. Print program\n" +
-            "3. One-step evaluation\n" +
-            "4. Complete evaluation (run)\n" +
-            "5. Toggle debug flag\n" +
+            "2. One-step evaluation\n" +
+            "3. Complete evaluation (run)\n" +
+            "4. Toggle debug flag\n" +
             "0. Exit";
     private String statementMenu = "\nSTATEMENT MENU\n" +
             "1. Compound statement\n" +
@@ -67,6 +68,7 @@ public class Ui {
 
         try{
             ctrl.allStep();
+            ctrl.getRepo().serialize();
         }catch (StatementExecutionException e){
             System.out.println("\nFINISHED\n");
         }
@@ -85,11 +87,18 @@ public class Ui {
         catch (IsNotKeyException e){
             System.out.println("There is no such key!");
         }
+        catch (IOException e){
+            System.err.println("Serialization failed:" + e.getMessage());
+        }
+        catch (RepositoryException e){
+            print("No program state!");
+        }
     }
 
     private void oneStep() {
         try{
-            ctrl.oneStep(ctrl.getRepo().getCrtPrg());
+            ctrl.oneStep();
+            ctrl.getRepo().serialize();
         } catch (StatementExecutionException e){
         System.out.println("\nFINISHED\n");
         }
@@ -108,10 +117,12 @@ public class Ui {
         catch (IsNotKeyException e) {
             System.out.println("There is no such key!");
         }
-    }
-
-    private void printPrg() {
-        System.out.println(ctrl.getRepo().getCrtPrg().toStr());
+        catch (IOException e){
+            System.err.println("Serialization failed:" + e.getMessage());
+        }
+        catch (RepositoryException e){
+            print("No program state.");
+        }
     }
 
     private void print(String message) {
@@ -144,31 +155,25 @@ public class Ui {
             if (option != 0 && crtPrg == null) {
                 switch (option) {
                     case 1: {
-                        //inputProgram();
-                        ctrl.getRepo().example1();
+                        inputProgram();
                         //ctrl.getRepo().example2();
-                        initialMenu();
+                        //initialMenu();
                         break;
                     }
                     case 2: {
-                        printPrg();
-                        initialMenu();
+                        oneStep();
+                        //initialMenu();
                         break;
                     }
                     case 3: {
-                        oneStep();
-                        initialMenu();
+                        allStep();
+                        //initialMenu();
                         break;
                     }
                     case 4: {
-                        allStep();
-                        initialMenu();
-                        break;
-                    }
-                    case 5: {
                         ctrl.changeDebugFlag();
                         System.out.println("Debug mode: " + ctrl.isDebugFlag() + "\n");
-                        initialMenu();
+                        //initialMenu();
                         break;
                     }
                     case 0:
@@ -177,11 +182,20 @@ public class Ui {
                         System.out.println("Invalid option, please try again!\n");
                 }
             }
+            initialMenu();
+        }
+        catch (RepositoryException e){
+            print("No program state added");
         }
         catch (InputDataTypeException e){
             print("Invalid option.");
             initialMenu();
-    }
+        }
+        catch (IOException e){
+            print("No program");
+            initialMenu();
+        }
+
 
     }
 
@@ -324,6 +338,10 @@ public class Ui {
                     current = switchStmt();
                     break;
                 }
+                case 8: {
+                    current = ifSkipStmt();
+                    break;
+                }
                 default:
                     System.out.println("Invalid option! ");
                     current = inputStatement();
@@ -388,7 +406,7 @@ public class Ui {
         return new ReadExp(no);
     }
 
-    private Exp inputExpression() {
+    private Exp inputExpression(){
         int option;
         System.out.println(expressionMenu);
         try {
@@ -432,16 +450,26 @@ public class Ui {
         return inputExpression();
     }
 
-    private void inputProgram() {
+    private void inputProgram() throws RepositoryException, IOException {
         IStmt programStmt = inputStatement();
-        /**        */
         LibStack stk = new LibStack<>();
         LibDictionary dict = new LibDictionary<>();
         LibList lst = new LibList<>();
-         //stk.push(programStmt);
 
-        PrgState crtPrg = new PrgState(stk,  dict, lst, programStmt);
+        IList<PrgState> prgStates = new LibList<>();
+        PrgState prgS = new PrgState(stk,  dict, lst, programStmt);
+        try{
+            prgStates.add(prgS);
+        }catch (FullListException e)
+        {
+            System.out.println("Full list");
+        }
 
-        ctrl.getRepo().setCrtPrg(crtPrg);
+        ctrl = new Controller(new Repository(prgStates));
+        crtPrg = ctrl.getRepo().getCrtPrg();
+        print(crtPrg.toStr());
+        ctrl.getRepo().serialize();
+
+
     }
 }

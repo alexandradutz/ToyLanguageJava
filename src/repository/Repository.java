@@ -4,9 +4,7 @@ import domain.DataStructures.Dictionary.ArrayDictionary;
 import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.LibDictionary;
-import domain.DataStructures.List.ArrayList;
-import domain.DataStructures.List.IList;
-import domain.DataStructures.List.LibList;
+import domain.DataStructures.List.*;
 import domain.DataStructures.Stack.ArrayStack;
 import domain.DataStructures.Stack.IStack;
 import domain.DataStructures.Stack.LibStack;
@@ -14,30 +12,41 @@ import domain.Expression.*;
 import domain.PrgState;
 import domain.Stmt.*;
 
+import java.io.*;
+
 /**
  * Created by Dutzi on 10/14/2015.
  */
 public class Repository implements IRepository {
-    private PrgState[] state;
+    private IList<PrgState> states;
 
-    public PrgState[] getState(){
-        return state;
+    public IList<PrgState> getState(){
+        return states;
     }
 
-    public void setCrtPrg(PrgState st) {
-        this.state[0] = st;
+    public void setCrtPrg(IList<PrgState> prgStates) {
+        this.states = prgStates;
     }
 
 
-    public Repository()
+    public Repository(IList<PrgState> prgStates)
     {
-        this.state = new PrgState[10];
+        this.states = prgStates;
     }
+
+    public Repository(){this.states = null;}
 
     @Override
-    public PrgState getCrtPrg()
+    public PrgState getCrtPrg() throws RepositoryException
     {
-        return this.state[0];
+        try{
+            if(states.size() > 0){
+                return this.states.get(0);
+            }
+        }catch (IndexOutOfBoundException e){
+            throw new RepositoryException();
+        }
+        throw new RepositoryException();
     }
 
     @Override
@@ -62,35 +71,41 @@ public class Repository implements IRepository {
 
         //exeStack.push(example);
         PrgState inputState = new PrgState(exeStack, symTable, out, example);
-        this.state[0] = inputState;
-        //if(exeStack.isEmpty()){
-        //    System.out.println("No input program. Exe Stack IS empty!");
-       // }else{
-       //     System.out.println("Exe Stack IS NOT empty");
-       // }
+        try {
+            this.states.add(inputState);
+        } catch (FullListException e){
+            System.err.println("full repository exception");
+        }
 
     }
 
     @Override
-    public void example2()
-    {
-        IStack exeStack = new ArrayStack();
-        IDictionary symTable = new ArrayDictionary();
-        IList out = new ArrayList();
-        IStmt prgStmt =  new CompStmt(new AssignStmt("v",new ConstExp(6)),
-                new CompStmt(new WhileStmt(new ArithExp(new VarExp("v"), new ConstExp(4), "-"),
-                new CompStmt(new PrintStmt(new VarExp("v")), new AssignStmt("v", new ArithExp(new VarExp("v"), new ConstExp(1), "-")))),
-                new PrintStmt(new VarExp("v"))));
-
-        //exeStack.push(prgStmt);
-        PrgState inputState = new PrgState(exeStack, symTable, out, prgStmt);
-        //this.state[0] = inputState;
-       // if(exeStack.isEmpty()){
-        //    System.out.println("No input program. Exe Stack IS empty!");
-       // }else{
-        //    System.out.println("Exe Stack IS NOT empty");
-       // }
-
+    public void serialize() throws IOException {
+        ObjectOutputStream out = null;
+        try {
+            FileOutputStream file = new FileOutputStream("PrgStateFile.ser");
+            out = new ObjectOutputStream(file);
+            out.writeObject(states);
+            out.close();
+        }
+        catch (IOException e){
+            System.err.println("Serialization failed: " + e.getMessage());
+        }
     }
 
+    @Override
+    public IList<PrgState> deserialize() throws IOException, ClassNotFoundException {
+        IList<PrgState> states = null;
+        ObjectInputStream in = null;
+        try{
+            FileInputStream file = new FileInputStream("PrgStateFile.ser");
+            in = new ObjectInputStream(file);
+            this.states = (IList<PrgState>) in.readObject();
+            in.close();
+        }catch (ClassNotFoundException e){
+            System.err.println("Serialization failed: " + e.getMessage());
+        }
+        return states;
+
+    }
 }
