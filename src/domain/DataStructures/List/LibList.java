@@ -40,6 +40,10 @@ public class LibList<T> implements IList<T> {
 
     @Override
     public String toString() {
-        return list.toString();
+        String res = "";
+        for (T elem : list) {
+            res = elem.toString()  + res;
+        }
+        return res;
     }
 }

@@ -1,9 +1,6 @@
 package repository;
 
-import domain.DataStructures.Dictionary.ArrayDictionary;
-import domain.DataStructures.Dictionary.FullMapException;
-import domain.DataStructures.Dictionary.IDictionary;
-import domain.DataStructures.Dictionary.LibDictionary;
+import domain.DataStructures.Dictionary.*;
 import domain.DataStructures.List.*;
 import domain.DataStructures.Stack.ArrayStack;
 import domain.DataStructures.Stack.IStack;
@@ -20,9 +17,6 @@ import java.io.*;
 public class Repository implements IRepository {
     private IList<PrgState> states;
 
-    public IList<PrgState> getState(){
-        return states;
-    }
 
     public void setCrtPrg(IList<PrgState> prgStates) {
         this.states = prgStates;
@@ -80,32 +74,76 @@ public class Repository implements IRepository {
     }
 
     @Override
-    public void serialize() throws IOException {
+    public void serialize() {
         ObjectOutputStream out = null;
         try {
             FileOutputStream file = new FileOutputStream("PrgStateFile.ser");
             out = new ObjectOutputStream(file);
             out.writeObject(states);
-            out.close();
         }
         catch (IOException e){
             System.err.println("Serialization failed: " + e.getMessage());
+        }
+        finally {
+            if (out != null)
+                try {
+                    out.close();
+                } catch(IOException e)  {
+                    System.err.println("Error " + e.getMessage());
+                }
         }
     }
 
     @Override
     public IList<PrgState> deserialize() throws IOException, ClassNotFoundException {
-        IList<PrgState> states = null;
+        //IList<PrgState> states = null;
         ObjectInputStream in = null;
         try{
             FileInputStream file = new FileInputStream("PrgStateFile.ser");
             in = new ObjectInputStream(file);
-            this.states = (IList<PrgState>) in.readObject();
-            in.close();
+            IList<PrgState> st = (IList<PrgState>) in.readObject();
+            this.setCrtPrg(st);
+
         }catch (ClassNotFoundException e){
             System.err.println("Serialization failed: " + e.getMessage());
         }
-        return states;
+        finally {
+            in.close();
+            return this.states;
+        }
+    }
+
+    public void writeToFile(String filename) throws IOException, RepositoryException{
+        FileWriter fstream = new FileWriter(filename, true);
+        BufferedWriter out = new BufferedWriter(fstream);
+        try {
+            out.write("EXE STACK:");
+            out.newLine();
+            out.write(getCrtPrg().getExeStack().toString());
+            out.newLine();
+            out.write("SYMBOL TABLE:");
+            out.newLine();
+            for (String key : getCrtPrg().getSymTable().keys()) {
+                out.write(key + "-->" + getCrtPrg().getSymTable().getValue(key));
+                out.newLine();
+            }
+            out.newLine();
+            out.write("OUTPUT: ");
+            out.newLine();
+            IList<String> lst = getCrtPrg().getOut();
+            for (int i = 0; i < lst.size(); i++) {
+                out.write(lst.get(i));
+                out.newLine();
+            }
+            out.newLine();
+            out.close();
+        }
+        catch (IndexOutOfBoundException e){
+            throw  new RepositoryException();
+        }
+        catch (IsNotKeyException e){
+            throw  new RepositoryException();
+        }
 
     }
 }

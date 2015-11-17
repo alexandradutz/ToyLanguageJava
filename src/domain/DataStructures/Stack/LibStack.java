@@ -40,7 +40,7 @@ public class LibStack<T> implements IStack<T>{
         //return toString();
         String res = "";
         for (T elem : stack) {
-            res = elem.toString() + res;
+            res = elem.toString() + "\n" + res;
         }
         return res;
     }

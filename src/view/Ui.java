@@ -1,5 +1,4 @@
 package view;
-
 import controller.Controller;
 import controller.StatementExecutionException;
 import domain.DataStructures.Dictionary.FullMapException;
@@ -13,7 +12,6 @@ import domain.DataStructures.Stack.LibStack;
 import domain.PrgState;
 import domain.Stmt.*;
 import domain.Expression.*;
-import repository.IRepository;
 import repository.Repository;
 import repository.RepositoryException;
 
@@ -27,7 +25,6 @@ import java.util.Scanner;
  */
 public class Ui {
     private Controller ctrl;
-    private IRepository repo;
     private Scanner reader;
     private PrgState crtPrg;
 
@@ -43,8 +40,10 @@ public class Ui {
     private String mainMenu = "\nMAIN MENU\n" +
             "1. Input a program\n" +
             "2. One-step evaluation\n" +
-            "3. Complete evaluation (run)\n" +
-            "4. Toggle debug flag\n" +
+            "3. Execute program \n" +
+            "4. Serialize program\n" +
+            "5. Deserialize program\n" +
+            "6. Write to file\n" +
             "0. Exit";
     private String statementMenu = "\nSTATEMENT MENU\n" +
             "1. Compound statement\n" +
@@ -67,10 +66,11 @@ public class Ui {
     private void allStep() {
 
         try{
-            ctrl.allStep();
-            ctrl.getRepo().serialize();
+            ctrl.allStep("log.txt");
         }catch (StatementExecutionException e){
             System.out.println("\nFINISHED\n");
+            ctrl.getRepo().serialize();
+            crtPrg = null;
         }
         catch (VariableNotDefinedException e){
             System.out.println("A variable is not defined!");
@@ -87,20 +87,21 @@ public class Ui {
         catch (IsNotKeyException e){
             System.out.println("There is no such key!");
         }
-        catch (IOException e){
-            System.err.println("Serialization failed:" + e.getMessage());
-        }
         catch (RepositoryException e){
             print("No program state!");
+        }
+        catch (IOException e){
+            print("IO");
         }
     }
 
     private void oneStep() {
         try{
-            ctrl.oneStep();
-            ctrl.getRepo().serialize();
+            ctrl.oneStep("log.txt");
         } catch (StatementExecutionException e){
-        System.out.println("\nFINISHED\n");
+            System.out.println("\nFINISHED\n");
+            ctrl.getRepo().serialize();
+            crtPrg = null;
         }
         catch (VariableNotDefinedException e){
             System.out.println("A variable is not defined!");
@@ -118,10 +119,7 @@ public class Ui {
             System.out.println("There is no such key!");
         }
         catch (IOException e){
-            System.err.println("Serialization failed:" + e.getMessage());
-        }
-        catch (RepositoryException e){
-            print("No program state.");
+            print("IO");
         }
     }
 
@@ -147,33 +145,75 @@ public class Ui {
             throw new InputDataTypeException();
         }
     }
+
+    private void toggleLogFlag(){
+        if (ctrl.isLogFlag()){ print("Log mode: ON"); }
+        else {print("Log mode OFF");}
+        print("1. Change Log Flag");
+        print("0. Do not change");
+    }
+
     private void initialMenu()  {
         int option;
         System.out.println(mainMenu);
         try {
             option = readInteger("Choose an option:");
-            if (option != 0 && crtPrg == null) {
+            if (option != 0 ) {
                 switch (option) {
                     case 1: {
                         inputProgram();
                         //ctrl.getRepo().example2();
-                        //initialMenu();
                         break;
                     }
                     case 2: {
-                        oneStep();
-                        //initialMenu();
-                        break;
+                        this.toggleLogFlag();
+                        try {
+                            int op = readInteger("Choose: ");
+                            if (op == 1) {
+                                ctrl.changeLogFlag();
+                            }
+                            else{ break; }
+                        } catch(InputDataTypeException e) {
+                                print("Input invalid");
+                        }
+                        finally{
+                            oneStep();
+                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile("log.txt"); }
+                            else { print(ctrl.getRepo().getCrtPrg().toStr()); }
+                            break;
+                        }
                     }
                     case 3: {
-                        allStep();
-                        //initialMenu();
-                        break;
+                        this.toggleLogFlag();
+                        try {
+                            int op = readInteger("Choose: ");
+                            if (op == 1) {
+                                ctrl.changeLogFlag();
+                            }
+                            else{ break; }
+                        } catch(InputDataTypeException e) {
+                            print("Input invalid");
+                        }
+                        finally{
+                            allStep();
+                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile("log.txt"); }
+                            else { print(ctrl.getRepo().getCrtPrg().toStr()); }
+                            break;
+                        }
                     }
                     case 4: {
-                        ctrl.changeDebugFlag();
-                        System.out.println("Debug mode: " + ctrl.isDebugFlag() + "\n");
-                        //initialMenu();
+                        ctrl.getRepo().serialize();
+                        print("Serialized!");
+                        break;
+                    }
+                    case 5: {
+                        IList<PrgState> desStates;
+                        desStates = ctrl.getRepo().deserialize();
+                        print(desStates.toString());
+                        break;
+                    }
+                    case 6: {
+                        ctrl.getRepo().writeToFile("log.txt");
                         break;
                     }
                     case 0:
@@ -185,7 +225,7 @@ public class Ui {
             initialMenu();
         }
         catch (RepositoryException e){
-            print("No program state added");
+            print("No program state added" );
         }
         catch (InputDataTypeException e){
             print("Invalid option.");
@@ -195,8 +235,11 @@ public class Ui {
             print("No program");
             initialMenu();
         }
-
-
+        catch (ClassNotFoundException e)
+        {
+            print("Deserialization problems.");
+            initialMenu();
+        }
     }
 
     public void run() {
@@ -350,8 +393,8 @@ public class Ui {
         }
         catch (InputDataTypeException e){
             System.out.println("Invalid input, try again!");
+            return inputStatement();
         }
-        return inputStatement();
     }
 
     private ArithExp arithExp() throws InputDataTypeException {
@@ -446,18 +489,22 @@ public class Ui {
         }
         catch (InputDataTypeException e){
             print("Invalid input, try again!");
+            return inputExpression();
         }
-        return inputExpression();
     }
 
     private void inputProgram() throws RepositoryException, IOException {
-        IStmt programStmt = inputStatement();
+        IStmt prgStatement = new CompStmt(new AssignStmt("a", new ArithExp(new ReadExp(0), new ConstExp(2), "-")),
+                new CompStmt(new IfStmt(new VarExp("a"), new AssignStmt("v", new ConstExp(2)),
+                        new AssignStmt("v", new ConstExp(3))), new PrintStmt(new VarExp("v"))));
+
+        //IStmt programStmt = inputStatement();
         LibStack stk = new LibStack<>();
         LibDictionary dict = new LibDictionary<>();
         LibList lst = new LibList<>();
 
         IList<PrgState> prgStates = new LibList<>();
-        PrgState prgS = new PrgState(stk,  dict, lst, programStmt);
+        PrgState prgS = new PrgState(stk,  dict, lst, prgStatement);
         try{
             prgStates.add(prgS);
         }catch (FullListException e)
@@ -468,8 +515,7 @@ public class Ui {
         ctrl = new Controller(new Repository(prgStates));
         crtPrg = ctrl.getRepo().getCrtPrg();
         print(crtPrg.toStr());
-        ctrl.getRepo().serialize();
-
+        //ctrl.getRepo().serialize();
 
     }
 }

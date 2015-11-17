@@ -4,6 +4,7 @@ import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.DataStructures.List.FullListException;
+import domain.DataStructures.List.IndexOutOfBoundException;
 import domain.DataStructures.Stack.EmptyStackException;
 import domain.DataStructures.List.IList;
 import domain.DataStructures.Stack.*;
@@ -11,8 +12,12 @@ import domain.Expression.*;
 import domain.PrgState;
 import domain.Stmt.*;
 import repository.IRepository;
+import repository.Repository;
 import repository.RepositoryException;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -22,6 +27,8 @@ public class Controller
 {
     private IRepository repo;
     private boolean debugFlag = false;
+    private PrgState crtPrg;
+    private boolean logFlag = false;
 
     /**
      *
@@ -30,19 +37,36 @@ public class Controller
         debugFlag = !debugFlag;
     }
 
-
-    public Controller(IRepository repo)
-    {
-        this.repo = repo;
-
+    public void changeLogFlag() {
+        logFlag = !logFlag;
     }
 
+    public boolean isLogFlag(){return logFlag;}
 
-    public void oneStep() throws RepositoryException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullMapException, FullListException
+    public Controller(IRepository repo) throws RepositoryException
     {
-        PrgState state = repo.getCrtPrg();
-        IStack<IStmt> stk = state.getExeStack();
+        this.repo = repo;
+        crtPrg = repo.getCrtPrg();
+   }
+
+    public PrgState getCrtPrgState() throws RepositoryException {
+        return repo.getCrtPrg();
+    }
+    public void oneStep(String file) throws IOException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullMapException, FullListException
+    {
+        IStack<IStmt> stk = crtPrg.getExeStack();
         try {
+            if(debugFlag)
+            {
+                System.out.println("Stack:  " + crtPrg.getExeStack().toString() +
+                        "\nSymbol Table: " + crtPrg.getSymTable().toString() +
+                        "\nOutput: " + crtPrg.getOut().toString() +
+                        "\n=========================================================\n");
+            }
+            if(logFlag)
+            {
+                this.getRepo().writeToFile(file);
+            }
             IStmt crtStmt = stk.pop();
             if (crtStmt instanceof CompStmt) {
                 CompStmt crtStmt1 = (CompStmt) crtStmt;
@@ -54,7 +78,7 @@ public class Controller
                 AssignStmt aStmt = (AssignStmt) crtStmt;
                 String id = aStmt.getId();
                 Exp exp = aStmt.getExp();
-                IDictionary<String, Integer> symTable = state.getSymTable();
+                IDictionary<String, Integer> symTable = crtPrg.getSymTable();
                 symTable.add(id, exp.eval(symTable));
             }
 
@@ -68,7 +92,7 @@ public class Controller
                     //return;
                 }
                 Exp ifExp = ifSt.getExp();
-                IDictionary<String, Integer> symTable = state.getSymTable();
+                IDictionary<String, Integer> symTable = crtPrg.getSymTable();
                 if (ifExp.eval(symTable) != 0) {
                     stk.push(thenS);
                 } else {
@@ -82,7 +106,7 @@ public class Controller
                 IStmt thenS = ifSt.getThenS();
                 IStmt elseS = ifSt.getElseS();
                 Exp ifExp = ifSt.getExp();
-                IDictionary<String, Integer> symTable = state.getSymTable();
+                IDictionary<String, Integer> symTable = crtPrg.getSymTable();
                 if (ifExp.eval(symTable) != 0) {
                     stk.push(thenS);
                 } else {
@@ -93,14 +117,14 @@ public class Controller
             if (crtStmt instanceof IncStmt) {
                 IncStmt incStmt = (IncStmt) crtStmt;
                 Exp exp = incStmt.getVar();
-                IDictionary<String, Integer> symTable = state.getSymTable();
+                IDictionary<String, Integer> symTable = crtPrg.getSymTable();
                 if (symTable.isKey(exp.toStr())) {
                     symTable.add(exp.toStr(), exp.eval(symTable) + 1);
 
                 }
             }
             if (crtStmt instanceof WhileStmt) {
-                IDictionary<String, Integer> symTable = state.getSymTable();
+                IDictionary<String, Integer> symTable = crtPrg.getSymTable();
                 WhileStmt whileSt = (WhileStmt) crtStmt;
                 if (whileSt.getExpr().eval(symTable) != 0) {
                     IStmt stmt = whileSt.getStmt();
@@ -111,7 +135,7 @@ public class Controller
 
             }
             if (crtStmt instanceof SwitchStmt) {
-                IDictionary<String, Integer> symTable = state.getSymTable();
+                IDictionary<String, Integer> symTable = crtPrg.getSymTable();
                 SwitchStmt switchSt = (SwitchStmt) crtStmt;
 
                 ArrayList<Exp> list = switchSt.getCaseTbl().keys();
@@ -125,36 +149,33 @@ public class Controller
                         System.out.println("Not a good value: in controller switch");
                     }
                 }
-                state.getExeStack().push(prevIfStmt);
+                crtPrg.getExeStack().push(prevIfStmt);
             } else if (crtStmt instanceof PrintStmt) {
                 PrintStmt pStmt = (PrintStmt) crtStmt;
-                IList<String> out = state.getOut();
-                out.add(Integer.toString(pStmt.getExp().eval(state.getSymTable())));
+                IList<String> out = crtPrg.getOut();
+                out.add(Integer.toString(pStmt.getExp().eval(crtPrg.getSymTable())));
             }
 
         } catch(EmptyStackException ex)
         {
             throw new StatementExecutionException();
         }
-        if(debugFlag)
+        catch (RepositoryException ex)
         {
-            System.out.println("Stack:  " + state.getExeStack().toString() +
-                    "\nSymbol Table: " + state.getSymTable().toString() +
-                    "\nOutput: " + state.getOut().toString() +
-                    "\n=========================================================\n");
+            throw  new StatementExecutionException();
         }
     }
 
     /**
      *
      */
-    public void allStep() throws RepositoryException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullListException, FullMapException
+    public void allStep(String file) throws IOException, RepositoryException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullListException, FullMapException
     {
         PrgState state = repo.getCrtPrg();
         IStack<IStmt> stk = state.getExeStack();
         while(!stk.isEmpty())
         {
-            this.oneStep();
+            this.oneStep(file);
         }
     }
 
