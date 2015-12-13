@@ -11,5 +11,5 @@ public interface IStack<T> extends Serializable{
     public T pop() throws EmptyStackException;
     public boolean isEmpty();
     public T top() throws EmptyStackException;
-    public String toString();
+    String toString();
 }

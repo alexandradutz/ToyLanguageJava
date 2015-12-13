@@ -2,6 +2,7 @@ package domain.Expression;
 
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.DataStructures.Heap.IHeap;
 
 /**
  * Created by Dutzi on 10/13/2015.
@@ -27,18 +28,18 @@ public class ArithExp extends Exp {
     }
 
     @Override
-    public int eval(IDictionary tbl)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
+    public int eval(IDictionary<String, Integer> tbl, IHeap<Integer> heap)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
         switch (opt){
-            case "+": return (exp1.eval(tbl) + exp2.eval(tbl));
-            case "-": return (exp1.eval(tbl) - exp2.eval(tbl));
-            case "*": return (exp1.eval(tbl) * exp2.eval(tbl));
+            case "+": return (exp1.eval(tbl, heap) + exp2.eval(tbl, heap));
+            case "-": return (exp1.eval(tbl, heap) - exp2.eval(tbl, heap));
+            case "*": return (exp1.eval(tbl, heap) * exp2.eval(tbl, heap));
             case "/":{
-                if(exp2.eval(tbl) != 0)
-                    return (exp1.eval(tbl) / exp2.eval(tbl));
+                if(exp2.eval(tbl, heap) != 0)
+                    return (exp1.eval(tbl, heap) / exp2.eval(tbl, heap));
                 throw new DivisionByZeroException();
             }
 
-            default: return eval(tbl);
+            default: return eval(tbl, heap);
         }
     }
 

@@ -5,13 +5,16 @@ import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.DataStructures.Dictionary.LibDictionary;
+import domain.DataStructures.Heap.LibHeap;
 import domain.DataStructures.List.FullListException;
 import domain.DataStructures.List.IList;
 import domain.DataStructures.List.LibList;
+import domain.DataStructures.Stack.EmptyStackException;
 import domain.DataStructures.Stack.LibStack;
 import domain.PrgState;
 import domain.Stmt.*;
 import domain.Expression.*;
+import repository.EmptyRepository;
 import repository.Repository;
 import repository.RepositoryException;
 
@@ -53,20 +56,23 @@ public class Ui {
             "5. Increment Statement\n" +
             "6. While Statement\n" +
             "7. Switch Statement\n" +
-            "8. IF Then Skip Statement\n";
+            "8. IF Then Skip Statement\n" +
+            "9. New Statement\n" +
+            "10.Write Heap Statement\n";
     private String expressionMenu = "\nEXPRESSION MENU\n" +
             "1. Arithmetical expression\n" +
             "2. Constant expression\n" +
             "3. Variable expression\n" +
             "4. Relational expression\n" +
             "5. Logical expression\n" +
-            "6. Read expression\n";
+            "6. Read expression\n" +
+            "7. Read Heap Expression\n";
 
 
     private void allStep() {
 
         try{
-            ctrl.allStep("log.txt");
+            ctrl.allStep(crtPrg);
         }catch (StatementExecutionException e){
             System.out.println("\nFINISHED\n");
             ctrl.getRepo().serialize();
@@ -87,17 +93,20 @@ public class Ui {
         catch (IsNotKeyException e){
             System.out.println("There is no such key!");
         }
-        catch (RepositoryException e){
+        catch (EmptyRepository e){
             print("No program state!");
         }
         catch (IOException e){
             print("IO");
         }
+        catch (EmptyStackException e){
+            print("No statement!");
+        }
     }
 
     private void oneStep() {
         try{
-            ctrl.oneStep("log.txt");
+            ctrl.oneStep(crtPrg);
         } catch (StatementExecutionException e){
             System.out.println("\nFINISHED\n");
             ctrl.getRepo().serialize();
@@ -120,6 +129,9 @@ public class Ui {
         }
         catch (IOException e){
             print("IO");
+        }
+        catch (EmptyStackException e){
+            print("No statement!");
         }
     }
 
@@ -178,8 +190,8 @@ public class Ui {
                         }
                         finally{
                             oneStep();
-                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile("log.txt"); }
-                            else { print(ctrl.getRepo().getCrtPrg().toStr()); }
+                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile(); }
+                            else { print(ctrl.getRepo().getCrtPrg().toString()); }
                             break;
                         }
                     }
@@ -196,8 +208,8 @@ public class Ui {
                         }
                         finally{
                             allStep();
-                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile("log.txt"); }
-                            else { print(ctrl.getRepo().getCrtPrg().toStr()); }
+                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile(); }
+                            else { print(ctrl.getRepo().getCrtPrg().toString()); }
                             break;
                         }
                     }
@@ -209,11 +221,11 @@ public class Ui {
                     case 5: {
                         IList<PrgState> desStates;
                         desStates = ctrl.getRepo().deserialize();
-                        print(desStates.toString());
+                        print(crtPrg.toString());
                         break;
                     }
                     case 6: {
-                        ctrl.getRepo().writeToFile("log.txt");
+                        ctrl.getRepo().writeToFile();
                         break;
                     }
                     case 0:
@@ -342,9 +354,24 @@ public class Ui {
         stmt = inputStatement();
         return  new SwitchStmt(varname, tbl, stmt);
     }
-    /**
-     * @return
-     */
+
+    private NewStmt newStmt() {
+        print("Varname:");
+        String varname = reader.next();
+        print("Expression:");
+        Exp exp = inputExpression();
+        return new NewStmt(varname, exp);
+    }
+
+    private HeapWriteStmt writeHeap(){
+        print("Varname:");
+        String varname = reader.next();
+        print("Expression:");
+        Exp exp = inputExpression();
+        return new HeapWriteStmt(varname, exp);
+    }
+
+
     private IStmt inputStatement() {
         int option;
         System.out.println(statementMenu);
@@ -383,6 +410,14 @@ public class Ui {
                 }
                 case 8: {
                     current = ifSkipStmt();
+                    break;
+                }
+                case 9: {
+                    current = newStmt();
+                    break;
+                }
+                case 10: {
+                    current = writeHeap();
                     break;
                 }
                 default:
@@ -449,6 +484,12 @@ public class Ui {
         return new ReadExp(no);
     }
 
+    private HeapReadExp readHeap(){
+        print("Varname:");
+        String varname = reader.next();
+        return new HeapReadExp(varname);
+    }
+
     private Exp inputExpression(){
         int option;
         System.out.println(expressionMenu);
@@ -480,6 +521,10 @@ public class Ui {
                     expression = readExp();
                     break;
                 }
+                case 7: {
+                    expression = readHeap();
+                    break;
+                }
                 default: {
                     System.out.println("Invalid option!");
                     expression = inputExpression();
@@ -494,17 +539,31 @@ public class Ui {
     }
 
     private void inputProgram() throws RepositoryException, IOException {
-        IStmt prgStatement = new CompStmt(new AssignStmt("a", new ArithExp(new ReadExp(0), new ConstExp(2), "-")),
-                new CompStmt(new IfStmt(new VarExp("a"), new AssignStmt("v", new ConstExp(2)),
-                        new AssignStmt("v", new ConstExp(3))), new PrintStmt(new VarExp("v"))));
 
-        //IStmt programStmt = inputStatement();
+        //IStmt prgStatement = inputStatement();
         LibStack stk = new LibStack<>();
         LibDictionary dict = new LibDictionary<>();
         LibList lst = new LibList<>();
+        LibHeap heap = new LibHeap<>();
+        LibDictionary<Exp, IStmt> tbl = new LibDictionary<>() ;
+        try {
+            tbl.add(new ConstExp(1), new CompStmt(new AssignStmt("a", new VarExp("v")), new PrintStmt(new ArithExp(new VarExp("a"), new ConstExp(1), "+"))));
+            tbl.add(new ConstExp(5), new CompStmt(new AssignStmt("a", new ArithExp(new VarExp("v"), new ConstExp(1), "+")), new PrintStmt(new ArithExp(new VarExp("a"), new ConstExp(1), "+"))));
+            tbl.add(new ConstExp(2), new CompStmt(new AssignStmt("a", new ArithExp(new VarExp("v"), new ConstExp(2), "+")), new PrintStmt(new ArithExp(new VarExp("a"), new ConstExp(1), "+"))));
+        }
+        catch (FullMapException e){
+            System.out.println("Full map");}
+        IStmt prgStatement = new CompStmt(new NewStmt("a", new ConstExp(10)), new CompStmt(new HeapWriteStmt("a", new ConstExp(4)), new CompStmt(new AssignStmt("b", new ConstExp(5)), new PrintStmt(new HeapReadExp("a")))));
+
+//                new CompStmt(new AssignStmt("v", new ConstExp(5)),
+//                new CompStmt(new SwitchStmt("v", tbl, new CompStmt(new AssignStmt("a", new ConstExp(0)), new PrintStmt(new VarExp("a")))),
+//                        new CompStmt(new AssignStmt("c", new ArithExp(new ReadExp(0), new BoolExp(new ConstExp(2), new ConstExp(10), "<"), "-")),
+//                                new AssignStmt("d", new LogicalExp(new LogicalExp(new VarExp("c"),"!"), new BoolExp(new ConstExp(10), new ConstExp(10), "<="), "&&")))));
+
 
         IList<PrgState> prgStates = new LibList<>();
-        PrgState prgS = new PrgState(stk,  dict, lst, prgStatement);
+
+        PrgState prgS = new PrgState(1, stk,  dict, lst, heap, prgStatement);
         try{
             prgStates.add(prgS);
         }catch (FullListException e)

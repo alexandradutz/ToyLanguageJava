@@ -49,7 +49,11 @@ public class LibDictionary <K, V> implements IDictionary<K, V> {
 
     @Override
     public String toString() {
-        return dictionary.toString();
+        String res = "";
+        for (K elem : dictionary.keySet()) {
+            res = elem.toString() + " -> " + dictionary.get(elem)  + "\n" + res;
+        }
+        return res;
     }
 
 

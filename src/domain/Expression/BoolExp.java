@@ -2,6 +2,7 @@ package domain.Expression;
 
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.DataStructures.Heap.IHeap;
 
 /**
  * Created by Dutzi on 11/8/2015.
@@ -28,40 +29,40 @@ public class BoolExp extends Exp {
     }
 
     @Override
-    public int eval(IDictionary tbl)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
+    public int eval(IDictionary<String, Integer> tbl, IHeap<Integer> heap)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
         switch (opt) {
             case "<":
-                if (exp1.eval(tbl) < exp2.eval(tbl)) {
+                if (exp1.eval(tbl, heap) < exp2.eval(tbl, heap)) {
                     return 1;
                 }
                 return 0;
             case "<=":
-                if (exp1.eval(tbl) <= exp2.eval(tbl)) {
+                if (exp1.eval(tbl, heap) <= exp2.eval(tbl, heap)) {
                     return 1;
                 }
                 return 0;
             case ">=":
-                if (exp1.eval(tbl) >= exp2.eval(tbl)) {
+                if (exp1.eval(tbl, heap) >= exp2.eval(tbl, heap)) {
                     return 1;
                 }
                 return 0;
             case ">":
-                if (exp1.eval(tbl) > exp2.eval(tbl)) {
+                if (exp1.eval(tbl, heap) > exp2.eval(tbl, heap)) {
                     return 1;
                 }
                 return 0;
             case "==":
-                if (exp1.eval(tbl) == exp2.eval(tbl)) {
+                if (exp1.eval(tbl, heap) == exp2.eval(tbl, heap)) {
                     return 1;
                 }
                 return 0;
             case "!=":
-                if (exp1.eval(tbl) != exp2.eval(tbl)) {
+                if (exp1.eval(tbl, heap) != exp2.eval(tbl, heap)) {
                     return 1;
                 }
                 return 0;
             default:
-                return eval(tbl);
+                return eval(tbl, heap);
         }
     }
 

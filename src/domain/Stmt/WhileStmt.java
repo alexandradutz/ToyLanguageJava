@@ -1,7 +1,12 @@
 package domain.Stmt;
 
+import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.Expression.DivisionByZeroException;
 import domain.Expression.Exp;
+import domain.Expression.VariableNotDefinedException;
+import domain.PrgState;
 
 /**
  * Created by Dutzi on 11/3/2015.
@@ -18,6 +23,15 @@ public class WhileStmt implements IStmt {
     @Override
     public String toString() {
         return "WHILE(" + expr.toStr() + ") {" + stmt.toString() + "}";
+    }
+
+    @Override
+    public PrgState execute(PrgState state) throws DivisionByZeroException, IsNotKeyException, VariableNotDefinedException, FullMapException {
+        if (getExpr().eval(state.getSymTable(), state.getHeap()) != 0) {
+            state.getExeStack().push(this);
+            state.getExeStack().push(this.getStmt());
+        }
+        return null;
     }
 
     public Exp getExpr() {

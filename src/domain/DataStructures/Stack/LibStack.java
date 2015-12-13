@@ -37,7 +37,6 @@ public class LibStack<T> implements IStack<T>{
 
     @Override
     public String toString() {
-        //return toString();
         String res = "";
         for (T elem : stack) {
             res = elem.toString() + "\n" + res;

@@ -52,7 +52,7 @@ public class ArrayStack implements IStack<IStmt> {
         String res = "";
         for(int i = 0; i < nrElem; i++)
         {
-            res = elems[i].toString() + " " + res;
+            res = elems[i].toString() + "\n" + res;
         }
         return res;
     }

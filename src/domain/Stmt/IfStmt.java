@@ -1,7 +1,12 @@
 package domain.Stmt;
 
+import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.Expression.DivisionByZeroException;
 import domain.Expression.Exp;
+import domain.Expression.VariableNotDefinedException;
+import domain.PrgState;
 
 /**
  * Created by Dutzi on 10/11/2015.
@@ -25,6 +30,16 @@ public class IfStmt implements IStmt {
         return "IF (" + exp.toStr() + ") THEN (" + thenS.toString() + ") ELSE (" + elseS.toString() + ")";
     }
 
+    @Override
+    public PrgState execute(PrgState state) throws DivisionByZeroException, IsNotKeyException, VariableNotDefinedException, FullMapException {
+        IDictionary<String, Integer> symTable = state.getSymTable();
+        if (exp.eval(symTable, state.getHeap()) != 0) {
+            state.getExeStack().push(thenS);
+        } else {
+            state.getExeStack().push(elseS);
+        }
+        return state;
+    }
 
     public Exp getExp() {
         return exp;

@@ -2,6 +2,7 @@ package domain.Expression;
 
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
+import domain.DataStructures.Heap.IHeap;
 
 /**
  * Created by Dutzi on 11/8/2015.
@@ -29,12 +30,12 @@ public class LogicalExp extends Exp {
     }
 
     @Override
-    public int eval(IDictionary tbl)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
+    public int eval(IDictionary<String, Integer> tbl, IHeap<Integer> heap)  throws IsNotKeyException, DivisionByZeroException, VariableNotDefinedException {
         switch (opt){
-            case "&&": if (exp1.eval(tbl)!=0 && exp2.eval(tbl)!=0){return 1;} return 0;
-            case "||": if (exp1.eval(tbl)!=0 || exp2.eval(tbl)!=0){return 1;} return 0;
-            case "!": if (exp1.eval(tbl) == 0){return 1;} return 0;
-            default: return eval(tbl);
+            case "&&": if (exp1.eval(tbl, heap)!=0 && exp2.eval(tbl, heap)!=0){return 1;} return 0;
+            case "||": if (exp1.eval(tbl, heap)!=0 || exp2.eval(tbl, heap)!=0){return 1;} return 0;
+            case "!": if (exp1.eval(tbl, heap) == 0){return 1;} return 0;
+            default: return eval(tbl, heap);
         }
     }
 

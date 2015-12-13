@@ -1,6 +1,7 @@
 package domain.Expression;
 
 import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Heap.IHeap;
 
 
 /**
@@ -15,7 +16,7 @@ public class ReadExp extends Exp {
     }
 
     @Override
-    public int eval(IDictionary tbl) {
+    public int eval(IDictionary<String, Integer> tbl, IHeap<Integer> heap) {
         //int no;
         //Scanner reader = new Scanner(System.in);
         //System.out.println("Introduces an integer for ToyLanguage ");
