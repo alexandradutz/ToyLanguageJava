@@ -1,11 +1,20 @@
 package domain;
 
+import controller.StatementExecutionException;
+import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
+import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.DataStructures.Heap.IHeap;
+import domain.DataStructures.List.FullListException;
 import domain.DataStructures.List.IList;
+import domain.DataStructures.Stack.EmptyStackException;
 import domain.DataStructures.Stack.IStack;
+import domain.Expression.DivisionByZeroException;
+import domain.Expression.VariableNotDefinedException;
 import domain.Stmt.IStmt;
+import repository.EmptyRepository;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -37,9 +46,20 @@ public class PrgState implements Serializable {
                 "\nExeStack:\n" + exeStack.toString() +
                 "\nSymbolTable:\n" + symTable.toString() +
                 "\nHeap:\n" + heap.toString() +
-                "\n\nOutput:\n" + out.toString() +
-                "\n\n==================================\n";
+                "\nOutput:\n" + out.toString()
+                ;
     }
+
+    public PrgState oneStep() throws EmptyStackException, IOException, StatementExecutionException, DivisionByZeroException, VariableNotDefinedException, IsNotKeyException, FullMapException, FullListException
+    {
+        IStack<IStmt> stk = this.getExeStack();
+        if(exeStack.isEmpty()) throw new StatementExecutionException();
+
+        IStmt crtStmt = stk.pop();
+        return crtStmt.execute(this);
+    }
+
+    public int getId(){return this.id;}
 
     public String toString(){
         return this.toStr();
@@ -65,5 +85,7 @@ public class PrgState implements Serializable {
     }
 
     public IHeap<Integer> getHeap() {return this.heap; }
+
+    public boolean isNotCompleted(){return !exeStack.isEmpty();}
 
 }

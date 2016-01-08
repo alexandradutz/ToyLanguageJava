@@ -42,7 +42,7 @@ public class LibList<T> implements IList<T> {
     public String toString() {
         String res = "";
         for (T elem : list) {
-            res = elem.toString()  + res;
+            res = res + " " +  elem.toString() ;
         }
         return res;
     }

@@ -6,14 +6,15 @@ import domain.DataStructures.List.IndexOutOfBoundException;
 import domain.PrgState;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Dutzi on 10/14/2015.
  */
 public interface IRepository {
-    PrgState getCrtPrg() throws EmptyRepository;
-    void setCrtPrg(IList<PrgState> state);
+    void setPrgList(List<PrgState> state);
+    List<PrgState> getPrgList();
     void serialize();
-    IList<PrgState> deserialize() throws IOException, ClassNotFoundException;
+    List<PrgState> deserialize() throws IOException, ClassNotFoundException;
     void writeToFile() throws IOException, EmptyRepository;
 }

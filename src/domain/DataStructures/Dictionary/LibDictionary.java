@@ -1,6 +1,8 @@
 package domain.DataStructures.Dictionary;
 
 
+import domain.DataStructures.Heap.LibHeap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,11 +12,13 @@ import java.util.HashMap;
 public class LibDictionary <K, V> implements IDictionary<K, V> {
     private HashMap<K, V> dictionary;
 
-    /**
-     * Constructs an empty HashMap with the default initial capacity (16).
-     */
+
     public LibDictionary(){
         this.dictionary = new HashMap<>();
+    }
+
+    public LibDictionary(LibDictionary<K, V> first){
+        this.dictionary = new HashMap<>(first.dictionary);
     }
 
     @Override

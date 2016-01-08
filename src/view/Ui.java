@@ -21,6 +21,8 @@ import repository.RepositoryException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -29,7 +31,7 @@ import java.util.Scanner;
 public class Ui {
     private Controller ctrl;
     private Scanner reader;
-    private PrgState crtPrg;
+   // private PrgState crtPrg;
 
     /**
      * @
@@ -71,27 +73,8 @@ public class Ui {
 
     private void allStep() {
 
-        try{
-            ctrl.allStep(crtPrg);
-        }catch (StatementExecutionException e){
-            System.out.println("\nFINISHED\n");
-            ctrl.getRepo().serialize();
-            crtPrg = null;
-        }
-        catch (VariableNotDefinedException e){
-            System.out.println("A variable is not defined!");
-        }
-        catch (DivisionByZeroException e){
-            System.out.println("Division by zero;");
-        }
-        catch (FullListException e){
-            System.out.println("There's no room for another output!");
-        }
-        catch (FullMapException e){
-            System.out.println("Symbol Table is full!");
-        }
-        catch (IsNotKeyException e){
-            System.out.println("There is no such key!");
+        try {
+            ctrl.allStep();
         }
         catch (EmptyRepository e){
             print("No program state!");
@@ -99,39 +82,23 @@ public class Ui {
         catch (IOException e){
             print("IO");
         }
-        catch (EmptyStackException e){
-            print("No statement!");
+        catch (InterruptedException e){
+            print("Interruption!");
         }
     }
 
     private void oneStep() {
         try{
-            ctrl.oneStep(crtPrg);
-        } catch (StatementExecutionException e){
-            System.out.println("\nFINISHED\n");
-            ctrl.getRepo().serialize();
-            crtPrg = null;
+            ctrl.oneStep();
         }
-        catch (VariableNotDefinedException e){
-            System.out.println("A variable is not defined!");
-        }
-        catch (DivisionByZeroException e){
-            System.out.println("Division by zero;");
-        }
-        catch (FullListException e){
-            System.out.println("There's no room for another output!");
-        }
-        catch (FullMapException e){
-            System.out.println("Symbol Table is full!");
-        }
-        catch (IsNotKeyException e) {
-            System.out.println("There is no such key!");
+        catch (EmptyRepository e){
+            print("No program state!");
         }
         catch (IOException e){
             print("IO");
         }
-        catch (EmptyStackException e){
-            print("No statement!");
+        catch (InterruptedException e){
+            print("Interruption!");
         }
     }
 
@@ -170,11 +137,13 @@ public class Ui {
         System.out.println(mainMenu);
         try {
             option = readInteger("Choose an option:");
-            if (option != 0 ) {
+            //if (option != 0 ) {
+            if (option != 1 && option != 5 && ctrl == null) {
+                print("There is no program, please insert a program");
+            }else{
                 switch (option) {
                     case 1: {
                         inputProgram();
-                        //ctrl.getRepo().example2();
                         break;
                     }
                     case 2: {
@@ -190,8 +159,6 @@ public class Ui {
                         }
                         finally{
                             oneStep();
-                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile(); }
-                            else { print(ctrl.getRepo().getCrtPrg().toString()); }
                             break;
                         }
                     }
@@ -208,8 +175,6 @@ public class Ui {
                         }
                         finally{
                             allStep();
-                            if (ctrl.isLogFlag()) { ctrl.getRepo().writeToFile(); }
-                            else { print(ctrl.getRepo().getCrtPrg().toString()); }
                             break;
                         }
                     }
@@ -219,9 +184,8 @@ public class Ui {
                         break;
                     }
                     case 5: {
-                        IList<PrgState> desStates;
+                        List<PrgState> desStates;
                         desStates = ctrl.getRepo().deserialize();
-                        print(crtPrg.toString());
                         break;
                     }
                     case 6: {
@@ -545,36 +509,38 @@ public class Ui {
         LibDictionary dict = new LibDictionary<>();
         LibList lst = new LibList<>();
         LibHeap heap = new LibHeap<>();
-        LibDictionary<Exp, IStmt> tbl = new LibDictionary<>() ;
-        try {
-            tbl.add(new ConstExp(1), new CompStmt(new AssignStmt("a", new VarExp("v")), new PrintStmt(new ArithExp(new VarExp("a"), new ConstExp(1), "+"))));
-            tbl.add(new ConstExp(5), new CompStmt(new AssignStmt("a", new ArithExp(new VarExp("v"), new ConstExp(1), "+")), new PrintStmt(new ArithExp(new VarExp("a"), new ConstExp(1), "+"))));
-            tbl.add(new ConstExp(2), new CompStmt(new AssignStmt("a", new ArithExp(new VarExp("v"), new ConstExp(2), "+")), new PrintStmt(new ArithExp(new VarExp("a"), new ConstExp(1), "+"))));
-        }
-        catch (FullMapException e){
-            System.out.println("Full map");}
-        IStmt prgStatement = new CompStmt(new NewStmt("a", new ConstExp(10)), new CompStmt(new HeapWriteStmt("a", new ConstExp(4)), new CompStmt(new AssignStmt("b", new ConstExp(5)), new PrintStmt(new HeapReadExp("a")))));
+        LibDictionary<Exp, IStmt> tbl = new LibDictionary<>();
 
-//                new CompStmt(new AssignStmt("v", new ConstExp(5)),
-//                new CompStmt(new SwitchStmt("v", tbl, new CompStmt(new AssignStmt("a", new ConstExp(0)), new PrintStmt(new VarExp("a")))),
-//                        new CompStmt(new AssignStmt("c", new ArithExp(new ReadExp(0), new BoolExp(new ConstExp(2), new ConstExp(10), "<"), "-")),
-//                                new AssignStmt("d", new LogicalExp(new LogicalExp(new VarExp("c"),"!"), new BoolExp(new ConstExp(10), new ConstExp(10), "<="), "&&")))));
+//
+//        v=10;new(a,22);
+//        fork(wH(a,30);
+//         v=32;
+//          print(v);
+//          print(rH(a)));
+//        print(v);
+//          print(rH(a))
+
+        IStmt st1 = new AssignStmt("v", new ConstExp(10));
+        IStmt st2 = new NewStmt("a", new ConstExp(22));
+        IStmt st3 = new AssignStmt("v", new ConstExp(32));
+        IStmt st4 = new PrintStmt(new VarExp("v"));
+        IStmt st5 = new PrintStmt(new HeapReadExp("a"));
+        IStmt st8 = new ForkStmt(new CompStmt(new HeapWriteStmt("a", new ConstExp(30)), new CompStmt(st3, new CompStmt(st4, st5))));
+        IStmt st6 = new PrintStmt(new VarExp("v"));
+        IStmt st7 = new PrintStmt(new HeapReadExp("a"));
+        IStmt prgStatement = new CompStmt(st1, new CompStmt(st2, new CompStmt(st8, new CompStmt(st6, st7))));
 
 
-        IList<PrgState> prgStates = new LibList<>();
+
+        List<PrgState> prgStates = new ArrayList<>();
 
         PrgState prgS = new PrgState(1, stk,  dict, lst, heap, prgStatement);
-        try{
-            prgStates.add(prgS);
-        }catch (FullListException e)
-        {
-            System.out.println("Full list");
-        }
+        prgStates.add(prgS);
+        print(prgStates.toString());
+
 
         ctrl = new Controller(new Repository(prgStates));
-        crtPrg = ctrl.getRepo().getCrtPrg();
-        print(crtPrg.toStr());
-        //ctrl.getRepo().serialize();
+        ctrl.getRepo().serialize();
 
     }
 }
