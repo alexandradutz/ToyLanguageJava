@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ViewsGUI.InitialMenuController">
+   <children>
+      <Button fx:id="inputProgram" alignment="CENTER" layoutX="132.0" layoutY="40.0" mnemonicParsing="false" onAction="#actionInputProgram" prefHeight="46.0" prefWidth="337.0" text="Input a program" />
+      <Button fx:id="allStepExecution" layoutX="132.0" layoutY="98.0" mnemonicParsing="false" onAction="#actionAllStepExecution" prefHeight="46.0" prefWidth="337.0" text="All-Step Execution" />
+      <Button fx:id="oneStepExecution" layoutX="132.0" layoutY="156.0" mnemonicParsing="false" onAction="#actionOneStepExecution" prefHeight="46.0" prefWidth="337.0" text="One-Step Execution" />
+      <Button fx:id="serialize" layoutX="132.0" layoutY="214.0" mnemonicParsing="false" onAction="#actionSerialize" prefHeight="46.0" prefWidth="337.0" text="Serialize" />
+      <Button fx:id="deserialize" layoutX="132.0" layoutY="272.0" mnemonicParsing="false" onAction="#actionDeserialize" prefHeight="46.0" prefWidth="337.0" text="Deserialize" />
+      <CheckBox fx:id="checkLog" layoutX="494.0" layoutY="135.0" mnemonicParsing="false" onAction="#actionCheckLog" prefHeight="23.0" prefWidth="92.0" text="Log to file" />
+      <Button fx:id="btnExit" layoutX="132.0" layoutY="330.0" mnemonicParsing="false" onAction="#actionBtnExit" prefHeight="46.0" prefWidth="337.0" text="Exit" />
+   </children>
+</AnchorPane>

@@ -29,6 +29,7 @@ public class Controller
     private boolean debugFlag = false;
     private PrgState crtPrg;
     private boolean logFlag = false;
+    private String programsOutput;
 
     /**
      *
@@ -46,6 +47,7 @@ public class Controller
     public Controller(IRepository repo) throws RepositoryException
     {
         this.repo = repo;
+        this.programsOutput = "";
    }
 
 
@@ -100,7 +102,7 @@ public class Controller
 //           }
 //       }
 
-        //prgList.addAll(newPrgList);
+        programsOutput += prgList.toString();
         repo.setPrgList(newPrgList);
         if (logFlag) {
             repo.writeToFile();
@@ -112,10 +114,13 @@ public class Controller
     }
 
 
+    public String getOutput(){return programsOutput;}
 
     public IRepository getRepo() {
         return repo;
     }
+
+    public List<PrgState> getPrgList(){return repo.getPrgList();}
 
     public void setRepo(IRepository repo) {
         this.repo = repo;
