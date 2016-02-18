@@ -6,6 +6,7 @@ import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.DataStructures.Dictionary.LibDictionary;
 import domain.DataStructures.Heap.LibHeap;
+import domain.DataStructures.LatchTable.LatchTable;
 import domain.DataStructures.List.FullListException;
 import domain.DataStructures.List.IList;
 import domain.DataStructures.List.LibList;
@@ -37,8 +38,6 @@ public class Ui {
      * @
      */
     public Ui() {
-        //repo = new Repository();
-        //ctrl = new Controller(repo);
         reader = new Scanner(System.in);
     }
 
@@ -184,8 +183,9 @@ public class Ui {
                         break;
                     }
                     case 5: {
-                        List<PrgState> desStates;
-                        desStates = ctrl.getRepo().deserialize();
+                        ctrl = new Controller(new Repository());
+                        ctrl.getRepo().deserialize();
+
                         break;
                     }
                     case 6: {
@@ -509,7 +509,10 @@ public class Ui {
         LibDictionary dict = new LibDictionary<>();
         LibList lst = new LibList<>();
         LibHeap heap = new LibHeap<>();
+        LatchTable latchTable = new LatchTable<>();
         LibDictionary<Exp, IStmt> tbl = new LibDictionary<>();
+
+        LibDictionary fileT = new LibDictionary<>();
 
 //
 //        v=10;new(a,22);
@@ -519,7 +522,7 @@ public class Ui {
 //          print(rH(a)));
 //        print(v);
 //          print(rH(a))
-
+/*
         IStmt st1 = new AssignStmt("v", new ConstExp(10));
         IStmt st2 = new NewStmt("a", new ConstExp(22));
         IStmt st3 = new AssignStmt("v", new ConstExp(32));
@@ -529,12 +532,14 @@ public class Ui {
         IStmt st6 = new PrintStmt(new VarExp("v"));
         IStmt st7 = new PrintStmt(new HeapReadExp("a"));
         IStmt prgStatement = new CompStmt(st1, new CompStmt(st2, new CompStmt(st8, new CompStmt(st6, st7))));
+*/
+        IStmt prgStatement =new CompStmt(new OpenFile("a.txt"), new CompStmt(new ForkStmt(new CompStmt(new OpenFile("a.txt"), new CompStmt(new WriteFile("a.txt", new ConstExp(10)), new CloseFileStmt("a.txt")))),  new CompStmt(new WriteFile("a.txt", new ConstExp(1)), new CloseFileStmt("a.txt"))));
 
 
 
         List<PrgState> prgStates = new ArrayList<>();
 
-        PrgState prgS = new PrgState(1, stk,  dict, lst, heap, prgStatement);
+        PrgState prgS = new PrgState(1, stk,  dict, lst, heap,fileT,latchTable, prgStatement);
         prgStates.add(prgS);
         print(prgStates.toString());
 

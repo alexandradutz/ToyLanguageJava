@@ -1,0 +1,120 @@
+ExeStack = [v=5; Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a);c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{}]
+Output = []
+ExeStack = [v=5
+ Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a);c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{}]
+Output = []
+ExeStack = [ Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a);c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [ Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a)
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [IF ( (5-1) ) THEN (IF ( (5-5) ) THEN (IF ( (5-2) ) THEN (a=0;print(a)) ELSE (a= (v+2) ;print( (a+1) ))) ELSE (a= (v+1) ;print( (a+1) ))) ELSE (a=v;print( (a+1) ))
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [IF ( (5-5) ) THEN (IF ( (5-2) ) THEN (a=0;print(a)) ELSE (a= (v+2) ;print( (a+1) ))) ELSE (a= (v+1) ;print( (a+1) ))
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [a= (v+1) ;print( (a+1) )
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [a= (v+1) 
+print( (a+1) )
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [print( (a+1) )
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, v=5}]
+Output = []
+ExeStack = [c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, v=5}]
+Output = [7]
+ExeStack = [c= (read()-(2 < 10)) 
+d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, v=5}]
+Output = [7]
+ExeStack = [d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, c=-1, v=5}]
+Output = [7]
+ExeStack = []
+SymbolTable = [{a=6, c=-1, d=0, v=5}]
+Output = [7]
+ExeStack = [v=5; Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a);c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{}]
+Output = []
+ExeStack = [v=5
+ Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a);c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{}]
+Output = []
+ExeStack = [ Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a);c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [ Switch (v)  case 2: a= (v+2) ;print( (a+1) ) case 5: a= (v+1) ;print( (a+1) ) case 1: a=v;print( (a+1) ) default: a=0;print(a)
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [IF ( (5-1) ) THEN (IF ( (5-5) ) THEN (IF ( (5-2) ) THEN (a=0;print(a)) ELSE (a= (v+2) ;print( (a+1) ))) ELSE (a= (v+1) ;print( (a+1) ))) ELSE (a=v;print( (a+1) ))
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [IF ( (5-5) ) THEN (IF ( (5-2) ) THEN (a=0;print(a)) ELSE (a= (v+2) ;print( (a+1) ))) ELSE (a= (v+1) ;print( (a+1) ))
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [a= (v+1) ;print( (a+1) )
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [a= (v+1) 
+print( (a+1) )
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{v=5}]
+Output = []
+ExeStack = [print( (a+1) )
+c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, v=5}]
+Output = []
+ExeStack = [c= (read()-(2 < 10)) ;d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, v=5}]
+Output = [7]
+ExeStack = [c= (read()-(2 < 10)) 
+d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, v=5}]
+Output = [7]
+ExeStack = [d=(!(c) && (10 <= 10))
+]
+SymbolTable = [{a=6, c=-1, v=5}]
+Output = [7]
+ExeStack = []
+SymbolTable = [{a=6, c=-1, d=0, v=5}]
+Output = [7]

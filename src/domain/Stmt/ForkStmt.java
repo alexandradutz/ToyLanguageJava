@@ -1,14 +1,17 @@
 package domain.Stmt;
 
 import domain.DataStructures.Dictionary.FullMapException;
+import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.IsNotKeyException;
 import domain.DataStructures.Dictionary.LibDictionary;
 import domain.DataStructures.Heap.IHeap;
+import domain.DataStructures.LatchTable.ILatchTable;
 import domain.DataStructures.List.FullListException;
 import domain.DataStructures.List.IList;
 import domain.DataStructures.Stack.LibStack;
 import domain.Expression.DivisionByZeroException;
 import domain.Expression.VariableNotDefinedException;
+import domain.MyBuffer;
 import domain.PrgState;
 
 /**
@@ -29,8 +32,10 @@ public class ForkStmt implements IStmt {
         LibDictionary symT2 = new LibDictionary<>(symT);
         IList<String> out = state.getOut();
         IHeap<Integer> heap = state.getHeap();
+        ILatchTable<Integer> latchTable = state.getLatchTable();
+        IDictionary<String, MyBuffer> fileT = state.getFileTable();
 
-        return new PrgState(state.getId() * 10, stk2, symT2, out, heap, stmt );
+        return new PrgState(state.getId() * 10, stk2, symT2, out, heap, fileT, latchTable, stmt );
 
     }
 

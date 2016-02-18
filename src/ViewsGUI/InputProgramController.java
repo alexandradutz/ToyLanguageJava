@@ -4,9 +4,11 @@ import domain.DataStructures.Dictionary.FullMapException;
 import domain.DataStructures.Dictionary.IDictionary;
 import domain.DataStructures.Dictionary.LibDictionary;
 import domain.DataStructures.Heap.LibHeap;
+import domain.DataStructures.LatchTable.LatchTable;
 import domain.DataStructures.List.LibList;
 import domain.DataStructures.Stack.LibStack;
 import domain.Expression.*;
+import domain.MyBuffer;
 import domain.PrgState;
 import domain.Stmt.*;
 import javafx.collections.ObservableList;
@@ -38,22 +40,62 @@ public class InputProgramController {
 
 
     public void actionBtnNewPrg(ActionEvent event) throws IOException {
-        IStmt program = newStatement("New Program");
+        //IStmt program = newStatement("New Program");
 
         LibStack stk = new LibStack<>();
         LibDictionary dict = new LibDictionary<>();
         LibList lst = new LibList<>();
         LibHeap heap = new LibHeap<>();
-        LibDictionary<Exp, IStmt> tbl = new LibDictionary<>();
+        LibDictionary fileT = new LibDictionary<>();
+        LatchTable latchTable = new LatchTable<>();
+//        IStmt prgStatement =new CompStmt(new OpenFile("a.txt"),
+//                new CompStmt(
+//                                new WriteFile("a.txt", new ConstExp(2)),
+//                                new CompStmt(
+//                                new WriteFile("a.txt", new ConstExp(10)),
+//                                        new CompStmt(
+//                                        new WriteFile("a.txt", new ConstExp(5)),
+//                                                new CompStmt(
+//                new WriteFile("a.txt", new ConstExp(1)), new CloseFileStmt("a.txt"))))));
+
+
+//        new(v1,2);new(v2,3);new(v3,4);newLatch(cnt,3);
+//        fork(wh(v1,rh(v1)*10));
+//        print(rh(v1));countDown(cnt));
+//        fork(wh(v2,rh(v2)*10));
+//        print(rh(v2));countDown(cnt));
+//        fork(wh(v3,rh(v3)*10));
+//        print(rh(v3));countDown(cnt));
+//        await(cnt);
+//        print(cnt);
+//        countDown(cnt);
+//        print(cnt)
+        IStmt prgStatement = new CompStmt(new NewStmt("v1", new ConstExp(2)),
+                            new CompStmt(new NewStmt("v2", new ConstExp(3)),
+                            new CompStmt(new NewStmt("v3", new ConstExp(4)),
+                            new CompStmt(new newLatchStmt("cnt", new ConstExp(3)),
+                            new CompStmt(new ForkStmt(new HeapWriteStmt("v1", new ArithExp(new HeapReadExp("v1"), new ConstExp(10), "*") )),
+                                    new CompStmt(new PrintStmt(new HeapReadExp("v1")),
+                                            new CompStmt(new CountDownStmt("cnt"),
+                            new CompStmt(new ForkStmt(new HeapWriteStmt("v2", new ArithExp(new HeapReadExp("v2"), new ConstExp(10), "*"))),
+                                            new CompStmt(new PrintStmt(new HeapReadExp("v2")),
+                                                   new CompStmt(new CountDownStmt("cnt"),
+                            new CompStmt(new ForkStmt(new HeapWriteStmt("v3", new ArithExp(new HeapReadExp("v3"), new ConstExp(10), "*"))),
+                                        new CompStmt(new PrintStmt(new HeapReadExp("v3")),
+                                                 new CompStmt(new CountDownStmt("cnt"),
+                            new CompStmt(new AwaitStmt("cnt"),
+                                    new CompStmt(new PrintStmt(new VarExp("cnt")),
+                                            new CompStmt(new CountDownStmt("cnt"), new PrintStmt(new VarExp("cnt"))))))))))))))))));
+
 
         List<PrgState> prgStates = new ArrayList<>();
 
-        PrgState prgS = new PrgState(1, stk, dict, lst, heap, program);
+        PrgState prgS = new PrgState(1, stk, dict, lst, heap, fileT,latchTable, prgStatement);
         prgStates.add(prgS);
 
         ctrl.getRepo().setPrgList(prgStates);
 
-        this.preview.setText(program.toString());
+        this.preview.setText(prgStatement.toString());
     }
 
     public String newString(String content) throws IOException{
@@ -66,7 +108,8 @@ public class InputProgramController {
 
 
     public IStmt newStatement(String content) throws IOException{
-        String[] items = {"Compound", "Assign", "Fork", "If", "If Then Skip", "Print", "Increment", "While", "Switch", "New", "Write Heap"};
+        String[] items = {"Compound", "Assign", "Fork", "If", "If Then Skip", "Print", "Increment", "While", "Switch", "New", "Write Heap", "Open File",
+                            "Write File", "Close File"};
         ChoiceDialog choiceStmt = new ChoiceDialog(items[0], items);
 
         choiceStmt.setTitle("New Statement");
@@ -124,8 +167,7 @@ public class InputProgramController {
                         System.out.println("Symbol Table is full!");
                     }
 
-                    System.out.println("Another CASE? (y/n)");
-                    opt = newString("Option");
+                    opt = newString("Another CASE? (y/n)");
                     if (opt.equals("n")) {
                         break;
                     }
@@ -146,6 +188,19 @@ public class InputProgramController {
             if (choice.equals("Fork")) {
                 IStmt stmt = newStatement("Statement");
                 return new ForkStmt(stmt);
+            }
+            if (choice.equals("Open File")){
+                String filename = newString("File name");
+                return new OpenFile(filename);
+            }
+            if(choice.equals("Write File")){
+                String filename = newString("File name");
+                Exp exp = newExpression("Buffer");
+                return new WriteFile(filename, exp);
+            }
+            if(choice.equals("Close File")){
+                String filename = newString("File name");
+                return new CloseFileStmt(filename);
             }
 
         }
